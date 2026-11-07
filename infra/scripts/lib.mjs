@@ -10,7 +10,7 @@ export function readSecrets() {
   const out = {};
   for (const line of readFileSync(SECRETS_FILE, 'utf8').split(/\r?\n/)) {
     const m = /^([A-Z0-9_]+)=(.*)$/.exec(line.trim());
-    if (m) out[m[1]] = m[2];
+    if (m) out[m[1]] = m[2].trim().replace(/^(["'])(.*)\1$/, '$2');
   }
   return out;
 }

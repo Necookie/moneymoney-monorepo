@@ -29,17 +29,30 @@ export interface ClerkVerifierOptions {
   authorizedParties?: string[];
 }
 
+/**
+ * Authorized-party rule: browser session tokens carry `azp` (the page origin) and it must be in
+ * the allow-list. Native (Android/iOS) session tokens carry no `azp`, so they are accepted on
+ * signature, expiry and owner checks alone. (Clerk's own `authorizedParties` option rejects tokens
+ * without `azp`, which would lock out the mobile app.)
+ */
+export function isAuthorizedParty(azp: unknown, allowed: readonly string[]): boolean {
+  if (azp === undefined || azp === null || azp === '') return true;
+  if (allowed.length === 0) return true;
+  return typeof azp === 'string' && allowed.includes(azp);
+}
+
 /** Clerk session-token verification (JWKS fetched with the secret key and cached by the SDK). */
 export function createClerkVerifier(options: ClerkVerifierOptions): TokenVerifier {
+  const allowed = options.authorizedParties ?? [];
   return async (token) => {
     const payload = await verifyToken(token, {
       secretKey: options.secretKey,
       ...(options.jwtKey ? { jwtKey: options.jwtKey } : {}),
-      ...(options.authorizedParties?.length
-        ? { authorizedParties: options.authorizedParties }
-        : {}),
     });
     if (!payload?.sub) throw new Error('Token has no subject');
+    if (!isAuthorizedParty(payload.azp, allowed)) {
+      throw new Error(`Unauthorized party ${String(payload.azp)}`);
+    }
     return { sub: payload.sub };
   };
 }

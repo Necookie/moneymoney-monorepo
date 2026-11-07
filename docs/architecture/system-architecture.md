@@ -10,7 +10,8 @@ flowchart LR
   end
   subgraph Cloudflare
     WK[Worker: moneymoney-web<br/>Next.js via OpenNext<br/>moneymoney.necookie.dev]
-    T[Tunnel: moneymoney-api<br/>api.moneymoney.necookie.dev]
+    GW[Worker: moneymoney-api-gateway<br/>api.moneymoney.necookie.dev]
+    T[Tunnel: moneymoney-api<br/>Workers VPC service, no public hostname]
   end
   C[(Clerk<br/>app_3LlSjoo…)]
   subgraph necore["necore (Ubuntu · Docker · Coolify)"]
@@ -23,8 +24,9 @@ flowchart LR
     OTHER[Other apps' stacks<br/>untouched]
   end
   W --> WK
-  W -- Bearer JWT --> T
-  A -- Bearer JWT --> T
+  W -- Bearer JWT --> GW
+  A -- Bearer JWT --> GW
+  GW -- VPC binding --> T
   W -. sign-in .-> C
   A -. sign-in .-> C
   T --> CF --> API --> PG
@@ -35,8 +37,10 @@ flowchart LR
 
 - The **web app** renders on Cloudflare Workers (OpenNext adapter). It talks to the API from the
   browser with a Clerk session token; it holds no database credentials.
-- The **API** is reachable publicly only through a **dedicated Cloudflare Tunnel** that runs as a
-  container inside the Money Money stack. No host ports are published; the shared Coolify proxy,
+- The **API** is reachable publicly only through the **`moneymoney-api-gateway` Worker**, which
+  forwards to the API privately via a **Workers VPC service** bound to a **dedicated Cloudflare
+  Tunnel** whose connector runs as a container inside the Money Money stack (the tunnel has no
+  public hostname). No host ports are published; the shared Coolify proxy,
   shared tunnels, SSH, Coolify admin and Postgres are never exposed.
 - **Postgres** sits on an `internal: true` network shared only with the API and the backup sidecar.
 

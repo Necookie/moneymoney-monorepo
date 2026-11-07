@@ -41,7 +41,7 @@ log(
 );
 if (inspect) process.exit(0);
 
-require(s, 'CLERK_SECRET_KEY', 'OWNER_CLERK_USER_ID', 'CLOUDFLARE_TUNNEL_TOKEN');
+require(s, 'CLERK_SECRET_KEY', 'OWNER_CLERK_USER_ID', 'CLOUDFLARE_TUNNEL_TOKEN'); // tunnel token: see infra/cloudflare/README.md
 const server = servers.find((x) => x.name === (s.COOLIFY_SERVER_NAME || 'localhost')) ?? servers[0];
 if (!server) throw new Error('No Coolify server found');
 
@@ -49,7 +49,7 @@ let project = projects.find((p) => p.name === PROJECT);
 if (!project) {
   project = await api('POST', '/projects', {
     name: PROJECT,
-    description: 'Money Money — isolated personal finance stack (API, Postgres, tunnel, backups)',
+    description: 'Money Money - isolated personal finance stack (API, Postgres, tunnel, backups)',
   });
   log(`created project "${PROJECT}" (${project.uuid})`);
 } else log(`reusing project "${PROJECT}" (${project.uuid})`);
@@ -96,10 +96,13 @@ await api('PATCH', `/applications/${app.uuid}/envs/bulk`, {
     value,
     is_preview: false,
     is_literal: true,
+    // Runtime-only: never pass secrets as Docker build args (they would land in image history).
+    is_buildtime: false,
+    is_runtime: true,
   })),
 });
 log(`set ${Object.keys(env).length} environment variables (values not printed)`);
 
-const deploy = await api('GET', `/deploy?uuid=${app.uuid}&force=false`);
+const deploy = await api('POST', `/deploy?uuid=${app.uuid}&force=false`);
 log(`deployment queued: ${JSON.stringify(deploy.deployments?.map((d) => d.deployment_uuid))}`);
 writeSecret('COOLIFY_APP_UUID', app.uuid);

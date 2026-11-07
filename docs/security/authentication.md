@@ -17,7 +17,9 @@
 
 `@clerk/backend` `verifyToken()` validates signature (JWKS via secret key, cached; or networkless
 `CLERK_JWT_KEY`), expiry/not-before and — when `CLERK_AUTHORIZED_PARTIES` is set — the `azp`
-origin (`https://moneymoney.necookie.dev`). The verified `sub` is mapped to an internal UUID
+origin (`https://moneymoney.necookie.dev`) for browser tokens. Native-app tokens carry no `azp`;
+they are accepted on signature, expiry and the owner allow-list (Clerk's built-in
+`authorizedParties` option would reject them, so the check is done in `isAuthorizedParty`). The verified `sub` is mapped to an internal UUID
 (`users.clerk_user_id`); **client-supplied user ids are never read** (unknown body fields are
 stripped). Every repository query filters by that internal id, and composite foreign keys make
 cross-user references impossible at the database level. Other users' records return 404.

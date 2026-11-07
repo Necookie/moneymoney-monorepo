@@ -1,0 +1,13 @@
+{
+  "$schema": "../../../node_modules/wrangler/config-schema.json",
+  "name": "moneymoney-api-gateway",
+  "main": "src/index.js",
+  "compatibility_date": "2026-11-01",
+  "account_id": "668f78c5a9581c5051bd60a4985d6166",
+  "workers_dev": false,
+  "preview_urls": false,
+  "routes": [{ "pattern": "api.moneymoney.necookie.dev", "custom_domain": true }],
+  // Workers VPC service → dedicated tunnel "moneymoney-api" → moneymoney-api:3001 (Docker DNS).
+  "vpc_services": [{ "binding": "API", "service_id": "01a1b4ca-fd2a-7bf3-a6cf-2c6192c79874" }],
+  "observability": { "enabled": true },
+}
