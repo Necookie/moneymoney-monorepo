@@ -48,9 +48,14 @@ export async function getAuthToken(): Promise<string | null> {
     }
   }
   if (!clerk.session) return null;
+  let token: string | null | undefined;
   try {
-    return (await clerk.session.getToken()) ?? null;
+    token = await clerk.session.getToken();
   } catch {
     throw new AuthUnavailableError('Could not refresh session (offline?)');
   }
+  // A session without a token yet (e.g. just after sign-in) is "retry later", never an
+  // unauthenticated request that the API would reject with 401.
+  if (!token) throw new AuthUnavailableError('Session token not ready yet');
+  return token;
 }

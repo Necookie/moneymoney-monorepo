@@ -25,9 +25,13 @@ export function errorMessage(error: unknown): string {
 }
 
 function shouldRetry(failureCount: number, error: unknown): boolean {
+  // A 401 right after sign-in/token rotation is retried once with a freshly fetched token.
+  if (isApiError(error) && error.status === 401) return failureCount < 1;
   if (isApiError(error) && !error.retryable) return false;
   return failureCount < 2;
 }
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 /**
  * Provides the typed API client (bearer token from the Clerk session) and a TanStack Query
@@ -42,17 +46,31 @@ export function ApiProvider({
   /** Optional pre-built client (tests/previews); defaults to the Clerk-authenticated client. */
   client?: ApiClient;
 }) {
-  const { getToken } = useAuth();
-  // Keep the latest getToken without recreating the client on every render.
-  const getTokenRef = useRef(getToken);
-  getTokenRef.current = getToken;
+  const { getToken, isLoaded, isSignedIn } = useAuth();
+  // Keep the latest auth state without recreating the client on every render.
+  const authRef = useRef({ getToken, isLoaded, isSignedIn });
+  authRef.current = { getToken, isLoaded, isSignedIn };
 
   const client = useMemo(
     () =>
       injected ??
       createApiClient({
         baseUrl: API_URL,
-        getToken: () => getTokenRef.current(),
+        // Right after sign-in Clerk can briefly report no session token; wait (≤ 5 s) for one
+        // instead of sending an unauthenticated request that would surface as a session error.
+        getToken: async () => {
+          for (let attempt = 0; attempt < 25; attempt++) {
+            const auth = authRef.current;
+            if (auth.isLoaded && auth.isSignedIn) {
+              const token = await auth.getToken();
+              if (token) return token;
+            } else if (auth.isLoaded && !auth.isSignedIn) {
+              return null;
+            }
+            await sleep(200);
+          }
+          return authRef.current.getToken();
+        },
       }),
     [injected],
   );
