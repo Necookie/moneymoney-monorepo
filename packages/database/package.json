@@ -1,0 +1,36 @@
+{
+  "name": "@mm/database",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Money Money PostgreSQL schema, migrations and client (Drizzle ORM).",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "drizzle"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint src",
+    "db:generate": "drizzle-kit generate",
+    "db:check": "drizzle-kit check"
+  },
+  "dependencies": {
+    "@mm/types": "workspace:*",
+    "drizzle-orm": "^0.45.4",
+    "postgres": "^3.4.9"
+  },
+  "devDependencies": {
+    "@mm/config": "workspace:*",
+    "@types/node": "^24.0.0",
+    "drizzle-kit": "^0.31.11"
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "name": "@mm/validation",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Zod schemas shared by the Money Money API, web and mobile apps.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint src"
+  },
+  "dependencies": {
+    "@mm/types": "workspace:*",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@mm/config": "workspace:*"
+  }
+}
