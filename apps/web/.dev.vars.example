@@ -1,0 +1,5 @@
+# Local values for `pnpm preview` (Workers runtime via wrangler). Copy to `.dev.vars` (git-ignored).
+# Selects which Next.js .env files are loaded inside the Worker.
+NEXTJS_ENV=development
+# Server-side Clerk secret (never commit a real value).
+CLERK_SECRET_KEY=sk_test_replace_me

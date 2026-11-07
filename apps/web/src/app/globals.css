@@ -1,0 +1,110 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import '@mm/design-tokens/tokens.css';
+
+/* Map the shared design tokens (CSS variables) onto Tailwind v4 theme utilities. */
+@theme inline {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --color-canvas: var(--mm-canvas);
+  --color-card: var(--mm-card);
+  --color-ink: var(--mm-ink);
+  --color-ink-soft: var(--mm-ink-soft);
+  --color-surface-dark: var(--mm-surface-dark);
+  --color-muted: var(--mm-muted);
+  --color-subtle: var(--mm-subtle);
+  --color-border: var(--mm-border);
+  --color-border-strong: var(--mm-border-strong);
+  --color-hover: var(--mm-hover);
+  --color-accent: var(--mm-accent);
+  --color-accent-ink: var(--mm-accent-ink);
+  --color-accent-hover: var(--mm-accent-hover);
+  --color-positive: var(--mm-positive);
+  --color-positive-soft: var(--mm-positive-soft);
+  --color-negative: var(--mm-negative);
+  --color-negative-soft: var(--mm-negative-soft);
+  --color-warning: var(--mm-warning);
+  --color-warning-soft: var(--mm-warning-soft);
+  --color-info: var(--mm-info);
+  --color-info-soft: var(--mm-info-soft);
+  --color-projection: var(--mm-projection);
+  --color-projection-soft: var(--mm-projection-soft);
+
+  --radius-button: var(--mm-radius-button);
+  --radius-input: var(--mm-radius-input);
+  --radius-card: var(--mm-radius-card);
+  --radius-card-lg: var(--mm-radius-card-lg);
+
+  --shadow-popover: 0 8px 24px rgba(12, 10, 8, 0.08), 0 1px 2px rgba(12, 10, 8, 0.06);
+
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+}
+
+@layer base {
+  *,
+  ::after,
+  ::before {
+    border-color: var(--mm-border);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    background: var(--mm-canvas);
+    color: var(--mm-ink);
+    font-family: var(--font-sans);
+    font-size: 15px;
+    line-height: 22px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--mm-ink);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px var(--mm-accent);
+  }
+
+  ::selection {
+    background: var(--mm-accent);
+    color: var(--mm-accent-ink);
+  }
+
+  input[type='number']::-webkit-inner-spin-button,
+  input[type='number']::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+}
+
+@utility tabular {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+}
+
+@utility section-label {
+  font-size: 11px;
+  line-height: 16px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--mm-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Recharts: keep focus outlines off SVG surfaces (keyboard focus is handled by our controls). */
+.recharts-wrapper svg:focus,
+.recharts-surface:focus {
+  outline: none;
+}

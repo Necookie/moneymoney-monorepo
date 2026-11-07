@@ -1,0 +1,14 @@
+# Next.js / OpenNext / Wrangler build output
+.next/
+.next-e2e/
+.open-next/
+.wrangler/
+next-env.d.ts
+*.tsbuildinfo
+# local secrets
+.env*.local
+.dev.vars
+# Playwright
+playwright-report/
+test-results/
+playwright/.cache/
