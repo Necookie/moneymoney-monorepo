@@ -33,7 +33,9 @@ const run = (cmd, cmdArgs, opts = {}) =>
     cwd: appDir,
     encoding: 'utf8',
     stdio: ['ignore', 'pipe', 'inherit'],
-    shell: process.platform === 'win32',
+    // Only npx is a .cmd shim on Windows; everything else runs without a shell so arguments
+    // (e.g. --notes with spaces) are passed verbatim.
+    shell: process.platform === 'win32' && cmd === 'npx',
     ...opts,
   }).trim();
 const log = (...m) => console.log('•', ...m);
