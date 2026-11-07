@@ -277,6 +277,14 @@ export const transactionPage = z.object({
   items: z.array(transaction),
   nextCursor: z.string().nullable(),
   totals: z.object({ income: centavos, expenses: centavos, refunds: centavos, net: centavos }),
+  /** Exact counts per type for the same filters, ignoring the `type` filter (for filter chips). */
+  countsByType: z.object({
+    income: z.number().int(),
+    expense: z.number().int(),
+    transfer: z.number().int(),
+    refund: z.number().int(),
+    adjustment: z.number().int(),
+  }),
 });
 export type TransactionPage = z.infer<typeof transactionPage>;
 

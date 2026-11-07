@@ -94,6 +94,16 @@ describe('accounts & transactions', () => {
     expect(page.totals.income).toBe(peso(30_000));
     expect(page.totals.expenses).toBe(peso(1_234.56));
     expect(page.items).toHaveLength(3);
+    expect(page.countsByType).toEqual({
+      income: 1,
+      expense: 1,
+      transfer: 1,
+      refund: 0,
+      adjustment: 0,
+    });
+    const onlyIncome = (await t.owner.get(`/transactions?type=income&from=${ago(10)}`)).body;
+    expect(onlyIncome.items).toHaveLength(1);
+    expect(onlyIncome.countsByType.expense).toBe(1); // counts ignore the type filter
 
     const dash = (await t.owner.get('/dashboard')).body;
     expect(dash.position.net).toBe(peso(52_000 + 30_000) - peso(1_234.56));

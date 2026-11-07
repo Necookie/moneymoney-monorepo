@@ -3,7 +3,9 @@
   "private": true,
   "description": "Money Money — know your money before you spend it.",
   "packageManager": "pnpm@12.18.0",
-  "engines": { "node": ">=22.12.0" },
+  "engines": {
+    "node": ">=22.12.0"
+  },
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",

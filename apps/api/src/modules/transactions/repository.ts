@@ -74,6 +74,14 @@ export async function listTransactions(db: Database, userId: string, q: Transact
     .from(transactions)
     .where(and(...where));
 
+  const countRows = await db
+    .select({ type: transactions.type, n: sql<string>`count(*)` })
+    .from(transactions)
+    .where(and(...filters(userId, { ...q, type: undefined })))
+    .groupBy(transactions.type);
+  const countsByType = { income: 0, expense: 0, transfer: 0, refund: 0, adjustment: 0 };
+  for (const r of countRows) countsByType[r.type] = Number(r.n);
+
   const page = rows.slice(0, limit);
   const last = page.at(-1);
   const income = Number(totals?.income ?? 0);
@@ -90,6 +98,7 @@ export async function listTransactions(db: Database, userId: string, q: Transact
           })
         : null,
     totals: { income, expenses, refunds, net: income - expenses + refunds },
+    countsByType,
   };
 }
 

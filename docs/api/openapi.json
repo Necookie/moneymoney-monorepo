@@ -19,9 +19,7 @@
     "/api/v1/me": {
       "get": {
         "summary": "Current user and settings",
-        "tags": [
-          "settings"
-        ],
+        "tags": ["settings"],
         "responses": {
           "200": {
             "description": "Default Response",
@@ -44,9 +42,7 @@
                       "properties": {
                         "currency": {
                           "type": "string",
-                          "enum": [
-                            "PHP"
-                          ]
+                          "enum": ["PHP"]
                         },
                         "timezone": {
                           "type": "string"
@@ -80,11 +76,7 @@
                       "additionalProperties": false
                     }
                   },
-                  "required": [
-                    "userId",
-                    "email",
-                    "settings"
-                  ],
+                  "required": ["userId", "email", "settings"],
                   "additionalProperties": false
                 }
               }
@@ -96,9 +88,7 @@
     "/api/v1/settings": {
       "get": {
         "summary": "Get settings",
-        "tags": [
-          "settings"
-        ],
+        "tags": ["settings"],
         "responses": {
           "200": {
             "description": "Default Response",
@@ -109,9 +99,7 @@
                   "properties": {
                     "currency": {
                       "type": "string",
-                      "enum": [
-                        "PHP"
-                      ]
+                      "enum": ["PHP"]
                     },
                     "timezone": {
                       "type": "string"
@@ -151,9 +139,7 @@
       },
       "patch": {
         "summary": "Update settings",
-        "tags": [
-          "settings"
-        ],
+        "tags": ["settings"],
         "requestBody": {
           "required": true,
           "content": {
@@ -192,9 +178,7 @@
                   "properties": {
                     "currency": {
                       "type": "string",
-                      "enum": [
-                        "PHP"
-                      ]
+                      "enum": ["PHP"]
                     },
                     "timezone": {
                       "type": "string"
@@ -236,9 +220,7 @@
     "/api/v1/accounts": {
       "get": {
         "summary": "List accounts with current balances",
-        "tags": [
-          "accounts"
-        ],
+        "tags": ["accounts"],
         "responses": {
           "200": {
             "description": "Default Response",
@@ -259,19 +241,11 @@
                       },
                       "type": {
                         "type": "string",
-                        "enum": [
-                          "cash",
-                          "bank",
-                          "ewallet",
-                          "savings",
-                          "credit"
-                        ]
+                        "enum": ["cash", "bank", "ewallet", "savings", "credit"]
                       },
                       "currency": {
                         "type": "string",
-                        "enum": [
-                          "PHP"
-                        ]
+                        "enum": ["PHP"]
                       },
                       "openingBalance": {
                         "type": "integer",
@@ -333,9 +307,7 @@
       },
       "post": {
         "summary": "Create account",
-        "tags": [
-          "accounts"
-        ],
+        "tags": ["accounts"],
         "requestBody": {
           "required": true,
           "content": {
@@ -355,20 +327,12 @@
                   },
                   "type": {
                     "type": "string",
-                    "enum": [
-                      "cash",
-                      "bank",
-                      "ewallet",
-                      "savings",
-                      "credit"
-                    ]
+                    "enum": ["cash", "bank", "ewallet", "savings", "credit"]
                   },
                   "currency": {
                     "default": "PHP",
                     "type": "string",
-                    "enum": [
-                      "PHP"
-                    ]
+                    "enum": ["PHP"]
                   },
                   "openingBalance": {
                     "default": 0,
@@ -392,11 +356,7 @@
                     "maxLength": 48
                   }
                 },
-                "required": [
-                  "name",
-                  "type",
-                  "openingDate"
-                ]
+                "required": ["name", "type", "openingDate"]
               }
             }
           }
@@ -419,19 +379,11 @@
                     },
                     "type": {
                       "type": "string",
-                      "enum": [
-                        "cash",
-                        "bank",
-                        "ewallet",
-                        "savings",
-                        "credit"
-                      ]
+                      "enum": ["cash", "bank", "ewallet", "savings", "credit"]
                     },
                     "currency": {
                       "type": "string",
-                      "enum": [
-                        "PHP"
-                      ]
+                      "enum": ["PHP"]
                     },
                     "openingBalance": {
                       "type": "integer",
@@ -493,9 +445,7 @@
     },
     "/api/v1/accounts/{id}": {
       "get": {
-        "tags": [
-          "accounts"
-        ],
+        "tags": ["accounts"],
         "parameters": [
           {
             "schema": {
@@ -526,19 +476,11 @@
                     },
                     "type": {
                       "type": "string",
-                      "enum": [
-                        "cash",
-                        "bank",
-                        "ewallet",
-                        "savings",
-                        "credit"
-                      ]
+                      "enum": ["cash", "bank", "ewallet", "savings", "credit"]
                     },
                     "currency": {
                       "type": "string",
-                      "enum": [
-                        "PHP"
-                      ]
+                      "enum": ["PHP"]
                     },
                     "openingBalance": {
                       "type": "integer",
@@ -598,9 +540,7 @@
         }
       },
       "patch": {
-        "tags": [
-          "accounts"
-        ],
+        "tags": ["accounts"],
         "requestBody": {
           "required": true,
           "content": {
@@ -671,19 +611,11 @@
                     },
                     "type": {
                       "type": "string",
-                      "enum": [
-                        "cash",
-                        "bank",
-                        "ewallet",
-                        "savings",
-                        "credit"
-                      ]
+                      "enum": ["cash", "bank", "ewallet", "savings", "credit"]
                     },
                     "currency": {
                       "type": "string",
-                      "enum": [
-                        "PHP"
-                      ]
+                      "enum": ["PHP"]
                     },
                     "openingBalance": {
                       "type": "integer",
@@ -744,9 +676,7 @@
       },
       "delete": {
         "summary": "Delete an unused account (archive accounts that have transactions)",
-        "tags": [
-          "accounts"
-        ],
+        "tags": ["accounts"],
         "parameters": [
           {
             "schema": {
@@ -767,9 +697,7 @@
                 "schema": {
                   "type": "string",
                   "nullable": true,
-                  "enum": [
-                    null
-                  ]
+                  "enum": [null]
                 }
               }
             }
@@ -779,9 +707,7 @@
     },
     "/api/v1/categories": {
       "get": {
-        "tags": [
-          "categories"
-        ],
+        "tags": ["categories"],
         "responses": {
           "200": {
             "description": "Default Response",
@@ -802,10 +728,7 @@
                       },
                       "kind": {
                         "type": "string",
-                        "enum": [
-                          "income",
-                          "expense"
-                        ]
+                        "enum": ["income", "expense"]
                       },
                       "color": {
                         "nullable": true,
@@ -844,9 +767,7 @@
         }
       },
       "post": {
-        "tags": [
-          "categories"
-        ],
+        "tags": ["categories"],
         "requestBody": {
           "required": true,
           "content": {
@@ -866,10 +787,7 @@
                   },
                   "kind": {
                     "type": "string",
-                    "enum": [
-                      "income",
-                      "expense"
-                    ]
+                    "enum": ["income", "expense"]
                   },
                   "color": {
                     "nullable": true,
@@ -883,10 +801,7 @@
                     "maxLength": 48
                   }
                 },
-                "required": [
-                  "name",
-                  "kind"
-                ]
+                "required": ["name", "kind"]
               }
             }
           }
@@ -909,10 +824,7 @@
                     },
                     "kind": {
                       "type": "string",
-                      "enum": [
-                        "income",
-                        "expense"
-                      ]
+                      "enum": ["income", "expense"]
                     },
                     "color": {
                       "nullable": true,
@@ -952,9 +864,7 @@
     },
     "/api/v1/categories/{id}": {
       "patch": {
-        "tags": [
-          "categories"
-        ],
+        "tags": ["categories"],
         "requestBody": {
           "required": true,
           "content": {
@@ -1016,10 +926,7 @@
                     },
                     "kind": {
                       "type": "string",
-                      "enum": [
-                        "income",
-                        "expense"
-                      ]
+                      "enum": ["income", "expense"]
                     },
                     "color": {
                       "nullable": true,
@@ -1060,9 +967,7 @@
     "/api/v1/transactions": {
       "get": {
         "summary": "Search and filter transactions (keyset paginated, newest first)",
-        "tags": [
-          "transactions"
-        ],
+        "tags": ["transactions"],
         "parameters": [
           {
             "schema": {
@@ -1105,13 +1010,7 @@
           {
             "schema": {
               "type": "string",
-              "enum": [
-                "income",
-                "expense",
-                "transfer",
-                "refund",
-                "adjustment"
-              ]
+              "enum": ["income", "expense", "transfer", "refund", "adjustment"]
             },
             "in": "query",
             "name": "type",
@@ -1174,13 +1073,7 @@
                           },
                           "type": {
                             "type": "string",
-                            "enum": [
-                              "income",
-                              "expense",
-                              "transfer",
-                              "refund",
-                              "adjustment"
-                            ]
+                            "enum": ["income", "expense", "transfer", "refund", "adjustment"]
                           },
                           "amount": {
                             "type": "integer",
@@ -1295,20 +1188,43 @@
                           "maximum": 100000000000000
                         }
                       },
-                      "required": [
-                        "income",
-                        "expenses",
-                        "refunds",
-                        "net"
-                      ],
+                      "required": ["income", "expenses", "refunds", "net"],
+                      "additionalProperties": false
+                    },
+                    "countsByType": {
+                      "type": "object",
+                      "properties": {
+                        "income": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "expense": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "transfer": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "refund": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "adjustment": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        }
+                      },
+                      "required": ["income", "expense", "transfer", "refund", "adjustment"],
                       "additionalProperties": false
                     }
                   },
-                  "required": [
-                    "items",
-                    "nextCursor",
-                    "totals"
-                  ],
+                  "required": ["items", "nextCursor", "totals", "countsByType"],
                   "additionalProperties": false
                 }
               }
@@ -1318,9 +1234,7 @@
       },
       "post": {
         "summary": "Create a transaction (idempotent on the client-generated id)",
-        "tags": [
-          "transactions"
-        ],
+        "tags": ["transactions"],
         "description": "Returns 201 when created and 200 when a transaction with the same id already exists. Set scheduledEventId (+ occurrenceDate) to convert a planned item into an actual transaction.",
         "requestBody": {
           "required": true,
@@ -1331,13 +1245,7 @@
                 "properties": {
                   "type": {
                     "type": "string",
-                    "enum": [
-                      "income",
-                      "expense",
-                      "transfer",
-                      "refund",
-                      "adjustment"
-                    ]
+                    "enum": ["income", "expense", "transfer", "refund", "adjustment"]
                   },
                   "amount": {
                     "type": "integer",
@@ -1402,13 +1310,7 @@
                     "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
                   }
                 },
-                "required": [
-                  "type",
-                  "amount",
-                  "accountId",
-                  "occurredOn",
-                  "id"
-                ]
+                "required": ["type", "amount", "accountId", "occurredOn", "id"]
               }
             }
           }
@@ -1428,13 +1330,7 @@
                     },
                     "type": {
                       "type": "string",
-                      "enum": [
-                        "income",
-                        "expense",
-                        "transfer",
-                        "refund",
-                        "adjustment"
-                      ]
+                      "enum": ["income", "expense", "transfer", "refund", "adjustment"]
                     },
                     "amount": {
                       "type": "integer",
@@ -1537,13 +1433,7 @@
                     },
                     "type": {
                       "type": "string",
-                      "enum": [
-                        "income",
-                        "expense",
-                        "transfer",
-                        "refund",
-                        "adjustment"
-                      ]
+                      "enum": ["income", "expense", "transfer", "refund", "adjustment"]
                     },
                     "amount": {
                       "type": "integer",
@@ -1638,9 +1528,7 @@
     "/api/v1/transactions/export.csv": {
       "get": {
         "summary": "Export transactions as CSV (same filters as the list)",
-        "tags": [
-          "transactions"
-        ],
+        "tags": ["transactions"],
         "parameters": [
           {
             "schema": {
@@ -1683,13 +1571,7 @@
           {
             "schema": {
               "type": "string",
-              "enum": [
-                "income",
-                "expense",
-                "transfer",
-                "refund",
-                "adjustment"
-              ]
+              "enum": ["income", "expense", "transfer", "refund", "adjustment"]
             },
             "in": "query",
             "name": "type",
@@ -1723,9 +1605,7 @@
     "/api/v1/transactions/import": {
       "post": {
         "summary": "Import transactions from CSV (dry run by default; duplicates skipped on re-import)",
-        "tags": [
-          "transactions"
-        ],
+        "tags": ["transactions"],
         "requestBody": {
           "required": true,
           "content": {
@@ -1748,9 +1628,7 @@
                     "type": "boolean"
                   }
                 },
-                "required": [
-                  "csv"
-                ]
+                "required": ["csv"]
               }
             }
           }
@@ -1790,10 +1668,7 @@
                             "type": "string"
                           }
                         },
-                        "required": [
-                          "line",
-                          "message"
-                        ],
+                        "required": ["line", "message"],
                         "additionalProperties": false
                       }
                     },
@@ -1813,13 +1688,7 @@
                           },
                           "type": {
                             "type": "string",
-                            "enum": [
-                              "income",
-                              "expense",
-                              "transfer",
-                              "refund",
-                              "adjustment"
-                            ]
+                            "enum": ["income", "expense", "transfer", "refund", "adjustment"]
                           },
                           "amount": {
                             "type": "integer",
@@ -1850,13 +1719,7 @@
                       }
                     }
                   },
-                  "required": [
-                    "dryRun",
-                    "imported",
-                    "skippedDuplicates",
-                    "errors",
-                    "preview"
-                  ],
+                  "required": ["dryRun", "imported", "skippedDuplicates", "errors", "preview"],
                   "additionalProperties": false
                 }
               }
@@ -1867,9 +1730,7 @@
     },
     "/api/v1/transactions/{id}": {
       "get": {
-        "tags": [
-          "transactions"
-        ],
+        "tags": ["transactions"],
         "parameters": [
           {
             "schema": {
@@ -1897,13 +1758,7 @@
                     },
                     "type": {
                       "type": "string",
-                      "enum": [
-                        "income",
-                        "expense",
-                        "transfer",
-                        "refund",
-                        "adjustment"
-                      ]
+                      "enum": ["income", "expense", "transfer", "refund", "adjustment"]
                     },
                     "amount": {
                       "type": "integer",
@@ -1995,9 +1850,7 @@
         }
       },
       "patch": {
-        "tags": [
-          "transactions"
-        ],
+        "tags": ["transactions"],
         "requestBody": {
           "required": true,
           "content": {
@@ -2007,13 +1860,7 @@
                 "properties": {
                   "type": {
                     "type": "string",
-                    "enum": [
-                      "income",
-                      "expense",
-                      "transfer",
-                      "refund",
-                      "adjustment"
-                    ]
+                    "enum": ["income", "expense", "transfer", "refund", "adjustment"]
                   },
                   "amount": {
                     "type": "integer",
@@ -2091,13 +1938,7 @@
                     },
                     "type": {
                       "type": "string",
-                      "enum": [
-                        "income",
-                        "expense",
-                        "transfer",
-                        "refund",
-                        "adjustment"
-                      ]
+                      "enum": ["income", "expense", "transfer", "refund", "adjustment"]
                     },
                     "amount": {
                       "type": "integer",
@@ -2189,9 +2030,7 @@
         }
       },
       "delete": {
-        "tags": [
-          "transactions"
-        ],
+        "tags": ["transactions"],
         "parameters": [
           {
             "schema": {
@@ -2212,9 +2051,7 @@
                 "schema": {
                   "type": "string",
                   "nullable": true,
-                  "enum": [
-                    null
-                  ]
+                  "enum": [null]
                 }
               }
             }
@@ -2225,9 +2062,7 @@
     "/api/v1/scheduled-events": {
       "get": {
         "summary": "List planned income and expenses",
-        "tags": [
-          "planner"
-        ],
+        "tags": ["planner"],
         "responses": {
           "200": {
             "description": "Default Response",
@@ -2248,10 +2083,7 @@
                       },
                       "direction": {
                         "type": "string",
-                        "enum": [
-                          "inflow",
-                          "outflow"
-                        ]
+                        "enum": ["inflow", "outflow"]
                       },
                       "kind": {
                         "type": "string",
@@ -2267,13 +2099,7 @@
                       },
                       "status": {
                         "type": "string",
-                        "enum": [
-                          "planned",
-                          "committed",
-                          "recurring",
-                          "paid",
-                          "cancelled"
-                        ]
+                        "enum": ["planned", "committed", "recurring", "paid", "cancelled"]
                       },
                       "amount": {
                         "type": "integer",
@@ -2297,17 +2123,11 @@
                       },
                       "currency": {
                         "type": "string",
-                        "enum": [
-                          "PHP"
-                        ]
+                        "enum": ["PHP"]
                       },
                       "confidence": {
                         "type": "string",
-                        "enum": [
-                          "confirmed",
-                          "likely",
-                          "uncertain"
-                        ]
+                        "enum": ["confirmed", "likely", "uncertain"]
                       },
                       "accountId": {
                         "nullable": true,
@@ -2364,10 +2184,7 @@
                           "monthEndRule": {
                             "default": "clamp",
                             "type": "string",
-                            "enum": [
-                              "clamp",
-                              "last_day"
-                            ]
+                            "enum": ["clamp", "last_day"]
                           },
                           "endDate": {
                             "default": null,
@@ -2445,9 +2262,7 @@
       },
       "post": {
         "summary": "Plan a future expense, bill, salary or contract income",
-        "tags": [
-          "planner"
-        ],
+        "tags": ["planner"],
         "description": "Planned items change projections only; they never alter actual balances.",
         "requestBody": {
           "required": true,
@@ -2463,10 +2278,7 @@
                   },
                   "direction": {
                     "type": "string",
-                    "enum": [
-                      "inflow",
-                      "outflow"
-                    ]
+                    "enum": ["inflow", "outflow"]
                   },
                   "kind": {
                     "type": "string",
@@ -2483,13 +2295,7 @@
                   "status": {
                     "default": "planned",
                     "type": "string",
-                    "enum": [
-                      "planned",
-                      "committed",
-                      "recurring",
-                      "paid",
-                      "cancelled"
-                    ]
+                    "enum": ["planned", "committed", "recurring", "paid", "cancelled"]
                   },
                   "amount": {
                     "type": "integer",
@@ -2514,18 +2320,12 @@
                   "currency": {
                     "default": "PHP",
                     "type": "string",
-                    "enum": [
-                      "PHP"
-                    ]
+                    "enum": ["PHP"]
                   },
                   "confidence": {
                     "default": "confirmed",
                     "type": "string",
-                    "enum": [
-                      "confirmed",
-                      "likely",
-                      "uncertain"
-                    ]
+                    "enum": ["confirmed", "likely", "uncertain"]
                   },
                   "accountId": {
                     "nullable": true,
@@ -2591,10 +2391,7 @@
                       "monthEndRule": {
                         "default": "clamp",
                         "type": "string",
-                        "enum": [
-                          "clamp",
-                          "last_day"
-                        ]
+                        "enum": ["clamp", "last_day"]
                       },
                       "endDate": {
                         "default": null,
@@ -2610,9 +2407,7 @@
                         "maximum": 1000
                       }
                     },
-                    "required": [
-                      "frequency"
-                    ]
+                    "required": ["frequency"]
                   },
                   "installments": {
                     "nullable": true,
@@ -2631,13 +2426,7 @@
                     "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
                   }
                 },
-                "required": [
-                  "name",
-                  "direction",
-                  "kind",
-                  "amount",
-                  "startDate"
-                ]
+                "required": ["name", "direction", "kind", "amount", "startDate"]
               }
             }
           }
@@ -2660,10 +2449,7 @@
                     },
                     "direction": {
                       "type": "string",
-                      "enum": [
-                        "inflow",
-                        "outflow"
-                      ]
+                      "enum": ["inflow", "outflow"]
                     },
                     "kind": {
                       "type": "string",
@@ -2679,13 +2465,7 @@
                     },
                     "status": {
                       "type": "string",
-                      "enum": [
-                        "planned",
-                        "committed",
-                        "recurring",
-                        "paid",
-                        "cancelled"
-                      ]
+                      "enum": ["planned", "committed", "recurring", "paid", "cancelled"]
                     },
                     "amount": {
                       "type": "integer",
@@ -2709,17 +2489,11 @@
                     },
                     "currency": {
                       "type": "string",
-                      "enum": [
-                        "PHP"
-                      ]
+                      "enum": ["PHP"]
                     },
                     "confidence": {
                       "type": "string",
-                      "enum": [
-                        "confirmed",
-                        "likely",
-                        "uncertain"
-                      ]
+                      "enum": ["confirmed", "likely", "uncertain"]
                     },
                     "accountId": {
                       "nullable": true,
@@ -2776,10 +2550,7 @@
                         "monthEndRule": {
                           "default": "clamp",
                           "type": "string",
-                          "enum": [
-                            "clamp",
-                            "last_day"
-                          ]
+                          "enum": ["clamp", "last_day"]
                         },
                         "endDate": {
                           "default": null,
@@ -2858,9 +2629,7 @@
     "/api/v1/scheduled-events/occurrences": {
       "get": {
         "summary": "Dated occurrences in a range (calendar/timeline), including paid and skipped",
-        "tags": [
-          "planner"
-        ],
+        "tags": ["planner"],
         "parameters": [
           {
             "schema": {
@@ -2901,10 +2670,7 @@
                       },
                       "direction": {
                         "type": "string",
-                        "enum": [
-                          "inflow",
-                          "outflow"
-                        ]
+                        "enum": ["inflow", "outflow"]
                       },
                       "kind": {
                         "type": "string",
@@ -2920,21 +2686,11 @@
                       },
                       "status": {
                         "type": "string",
-                        "enum": [
-                          "planned",
-                          "committed",
-                          "recurring",
-                          "paid",
-                          "cancelled"
-                        ]
+                        "enum": ["planned", "committed", "recurring", "paid", "cancelled"]
                       },
                       "confidence": {
                         "type": "string",
-                        "enum": [
-                          "confirmed",
-                          "likely",
-                          "uncertain"
-                        ]
+                        "enum": ["confirmed", "likely", "uncertain"]
                       },
                       "accountId": {
                         "nullable": true,
@@ -3039,9 +2795,7 @@
     },
     "/api/v1/scheduled-events/{id}": {
       "get": {
-        "tags": [
-          "planner"
-        ],
+        "tags": ["planner"],
         "parameters": [
           {
             "schema": {
@@ -3072,10 +2826,7 @@
                     },
                     "direction": {
                       "type": "string",
-                      "enum": [
-                        "inflow",
-                        "outflow"
-                      ]
+                      "enum": ["inflow", "outflow"]
                     },
                     "kind": {
                       "type": "string",
@@ -3091,13 +2842,7 @@
                     },
                     "status": {
                       "type": "string",
-                      "enum": [
-                        "planned",
-                        "committed",
-                        "recurring",
-                        "paid",
-                        "cancelled"
-                      ]
+                      "enum": ["planned", "committed", "recurring", "paid", "cancelled"]
                     },
                     "amount": {
                       "type": "integer",
@@ -3121,17 +2866,11 @@
                     },
                     "currency": {
                       "type": "string",
-                      "enum": [
-                        "PHP"
-                      ]
+                      "enum": ["PHP"]
                     },
                     "confidence": {
                       "type": "string",
-                      "enum": [
-                        "confirmed",
-                        "likely",
-                        "uncertain"
-                      ]
+                      "enum": ["confirmed", "likely", "uncertain"]
                     },
                     "accountId": {
                       "nullable": true,
@@ -3188,10 +2927,7 @@
                         "monthEndRule": {
                           "default": "clamp",
                           "type": "string",
-                          "enum": [
-                            "clamp",
-                            "last_day"
-                          ]
+                          "enum": ["clamp", "last_day"]
                         },
                         "endDate": {
                           "default": null,
@@ -3258,12 +2994,7 @@
                           },
                           "action": {
                             "type": "string",
-                            "enum": [
-                              "skip",
-                              "reschedule",
-                              "paid",
-                              "amount"
-                            ]
+                            "enum": ["skip", "reschedule", "paid", "amount"]
                           },
                           "newDate": {
                             "nullable": true,
@@ -3327,9 +3058,7 @@
         }
       },
       "patch": {
-        "tags": [
-          "planner"
-        ],
+        "tags": ["planner"],
         "requestBody": {
           "required": true,
           "content": {
@@ -3344,10 +3073,7 @@
                   },
                   "direction": {
                     "type": "string",
-                    "enum": [
-                      "inflow",
-                      "outflow"
-                    ]
+                    "enum": ["inflow", "outflow"]
                   },
                   "kind": {
                     "type": "string",
@@ -3363,13 +3089,7 @@
                   },
                   "status": {
                     "type": "string",
-                    "enum": [
-                      "planned",
-                      "committed",
-                      "recurring",
-                      "paid",
-                      "cancelled"
-                    ]
+                    "enum": ["planned", "committed", "recurring", "paid", "cancelled"]
                   },
                   "amount": {
                     "type": "integer",
@@ -3393,17 +3113,11 @@
                   },
                   "currency": {
                     "type": "string",
-                    "enum": [
-                      "PHP"
-                    ]
+                    "enum": ["PHP"]
                   },
                   "confidence": {
                     "type": "string",
-                    "enum": [
-                      "confirmed",
-                      "likely",
-                      "uncertain"
-                    ]
+                    "enum": ["confirmed", "likely", "uncertain"]
                   },
                   "accountId": {
                     "nullable": true,
@@ -3460,10 +3174,7 @@
                       "monthEndRule": {
                         "default": "clamp",
                         "type": "string",
-                        "enum": [
-                          "clamp",
-                          "last_day"
-                        ]
+                        "enum": ["clamp", "last_day"]
                       },
                       "endDate": {
                         "default": null,
@@ -3479,9 +3190,7 @@
                         "maximum": 1000
                       }
                     },
-                    "required": [
-                      "frequency"
-                    ]
+                    "required": ["frequency"]
                   },
                   "installments": {
                     "nullable": true,
@@ -3529,10 +3238,7 @@
                     },
                     "direction": {
                       "type": "string",
-                      "enum": [
-                        "inflow",
-                        "outflow"
-                      ]
+                      "enum": ["inflow", "outflow"]
                     },
                     "kind": {
                       "type": "string",
@@ -3548,13 +3254,7 @@
                     },
                     "status": {
                       "type": "string",
-                      "enum": [
-                        "planned",
-                        "committed",
-                        "recurring",
-                        "paid",
-                        "cancelled"
-                      ]
+                      "enum": ["planned", "committed", "recurring", "paid", "cancelled"]
                     },
                     "amount": {
                       "type": "integer",
@@ -3578,17 +3278,11 @@
                     },
                     "currency": {
                       "type": "string",
-                      "enum": [
-                        "PHP"
-                      ]
+                      "enum": ["PHP"]
                     },
                     "confidence": {
                       "type": "string",
-                      "enum": [
-                        "confirmed",
-                        "likely",
-                        "uncertain"
-                      ]
+                      "enum": ["confirmed", "likely", "uncertain"]
                     },
                     "accountId": {
                       "nullable": true,
@@ -3645,10 +3339,7 @@
                         "monthEndRule": {
                           "default": "clamp",
                           "type": "string",
-                          "enum": [
-                            "clamp",
-                            "last_day"
-                          ]
+                          "enum": ["clamp", "last_day"]
                         },
                         "endDate": {
                           "default": null,
@@ -3724,9 +3415,7 @@
         }
       },
       "delete": {
-        "tags": [
-          "planner"
-        ],
+        "tags": ["planner"],
         "parameters": [
           {
             "schema": {
@@ -3747,9 +3436,7 @@
                 "schema": {
                   "type": "string",
                   "nullable": true,
-                  "enum": [
-                    null
-                  ]
+                  "enum": [null]
                 }
               }
             }
@@ -3760,9 +3447,7 @@
     "/api/v1/scheduled-events/{id}/postpone": {
       "post": {
         "summary": "Move an occurrence to a later (or earlier) date",
-        "tags": [
-          "planner"
-        ],
+        "tags": ["planner"],
         "requestBody": {
           "required": true,
           "content": {
@@ -3779,10 +3464,7 @@
                     "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
                   }
                 },
-                "required": [
-                  "occurrenceDate",
-                  "newDate"
-                ]
+                "required": ["occurrenceDate", "newDate"]
               }
             }
           }
@@ -3817,10 +3499,7 @@
                     },
                     "direction": {
                       "type": "string",
-                      "enum": [
-                        "inflow",
-                        "outflow"
-                      ]
+                      "enum": ["inflow", "outflow"]
                     },
                     "kind": {
                       "type": "string",
@@ -3836,13 +3515,7 @@
                     },
                     "status": {
                       "type": "string",
-                      "enum": [
-                        "planned",
-                        "committed",
-                        "recurring",
-                        "paid",
-                        "cancelled"
-                      ]
+                      "enum": ["planned", "committed", "recurring", "paid", "cancelled"]
                     },
                     "amount": {
                       "type": "integer",
@@ -3866,17 +3539,11 @@
                     },
                     "currency": {
                       "type": "string",
-                      "enum": [
-                        "PHP"
-                      ]
+                      "enum": ["PHP"]
                     },
                     "confidence": {
                       "type": "string",
-                      "enum": [
-                        "confirmed",
-                        "likely",
-                        "uncertain"
-                      ]
+                      "enum": ["confirmed", "likely", "uncertain"]
                     },
                     "accountId": {
                       "nullable": true,
@@ -3933,10 +3600,7 @@
                         "monthEndRule": {
                           "default": "clamp",
                           "type": "string",
-                          "enum": [
-                            "clamp",
-                            "last_day"
-                          ]
+                          "enum": ["clamp", "last_day"]
                         },
                         "endDate": {
                           "default": null,
@@ -4015,9 +3679,7 @@
     "/api/v1/scheduled-events/{id}/skip": {
       "post": {
         "summary": "Skip one occurrence (cancels a one-off)",
-        "tags": [
-          "planner"
-        ],
+        "tags": ["planner"],
         "requestBody": {
           "required": true,
           "content": {
@@ -4030,9 +3692,7 @@
                     "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
                   }
                 },
-                "required": [
-                  "occurrenceDate"
-                ]
+                "required": ["occurrenceDate"]
               }
             }
           }
@@ -4067,10 +3727,7 @@
                     },
                     "direction": {
                       "type": "string",
-                      "enum": [
-                        "inflow",
-                        "outflow"
-                      ]
+                      "enum": ["inflow", "outflow"]
                     },
                     "kind": {
                       "type": "string",
@@ -4086,13 +3743,7 @@
                     },
                     "status": {
                       "type": "string",
-                      "enum": [
-                        "planned",
-                        "committed",
-                        "recurring",
-                        "paid",
-                        "cancelled"
-                      ]
+                      "enum": ["planned", "committed", "recurring", "paid", "cancelled"]
                     },
                     "amount": {
                       "type": "integer",
@@ -4116,17 +3767,11 @@
                     },
                     "currency": {
                       "type": "string",
-                      "enum": [
-                        "PHP"
-                      ]
+                      "enum": ["PHP"]
                     },
                     "confidence": {
                       "type": "string",
-                      "enum": [
-                        "confirmed",
-                        "likely",
-                        "uncertain"
-                      ]
+                      "enum": ["confirmed", "likely", "uncertain"]
                     },
                     "accountId": {
                       "nullable": true,
@@ -4183,10 +3828,7 @@
                         "monthEndRule": {
                           "default": "clamp",
                           "type": "string",
-                          "enum": [
-                            "clamp",
-                            "last_day"
-                          ]
+                          "enum": ["clamp", "last_day"]
                         },
                         "endDate": {
                           "default": null,
@@ -4264,9 +3906,7 @@
     },
     "/api/v1/scheduled-events/{id}/cancel": {
       "post": {
-        "tags": [
-          "planner"
-        ],
+        "tags": ["planner"],
         "parameters": [
           {
             "schema": {
@@ -4297,10 +3937,7 @@
                     },
                     "direction": {
                       "type": "string",
-                      "enum": [
-                        "inflow",
-                        "outflow"
-                      ]
+                      "enum": ["inflow", "outflow"]
                     },
                     "kind": {
                       "type": "string",
@@ -4316,13 +3953,7 @@
                     },
                     "status": {
                       "type": "string",
-                      "enum": [
-                        "planned",
-                        "committed",
-                        "recurring",
-                        "paid",
-                        "cancelled"
-                      ]
+                      "enum": ["planned", "committed", "recurring", "paid", "cancelled"]
                     },
                     "amount": {
                       "type": "integer",
@@ -4346,17 +3977,11 @@
                     },
                     "currency": {
                       "type": "string",
-                      "enum": [
-                        "PHP"
-                      ]
+                      "enum": ["PHP"]
                     },
                     "confidence": {
                       "type": "string",
-                      "enum": [
-                        "confirmed",
-                        "likely",
-                        "uncertain"
-                      ]
+                      "enum": ["confirmed", "likely", "uncertain"]
                     },
                     "accountId": {
                       "nullable": true,
@@ -4413,10 +4038,7 @@
                         "monthEndRule": {
                           "default": "clamp",
                           "type": "string",
-                          "enum": [
-                            "clamp",
-                            "last_day"
-                          ]
+                          "enum": ["clamp", "last_day"]
                         },
                         "endDate": {
                           "default": null,
@@ -4495,9 +4117,7 @@
     "/api/v1/scheduled-events/{id}/split": {
       "post": {
         "summary": "Split part of a one-off item onto another date",
-        "tags": [
-          "planner"
-        ],
+        "tags": ["planner"],
         "requestBody": {
           "required": true,
           "content": {
@@ -4521,10 +4141,7 @@
                     "maxLength": 120
                   }
                 },
-                "required": [
-                  "amount",
-                  "startDate"
-                ]
+                "required": ["amount", "startDate"]
               }
             }
           }
@@ -4562,10 +4179,7 @@
                         },
                         "direction": {
                           "type": "string",
-                          "enum": [
-                            "inflow",
-                            "outflow"
-                          ]
+                          "enum": ["inflow", "outflow"]
                         },
                         "kind": {
                           "type": "string",
@@ -4581,13 +4195,7 @@
                         },
                         "status": {
                           "type": "string",
-                          "enum": [
-                            "planned",
-                            "committed",
-                            "recurring",
-                            "paid",
-                            "cancelled"
-                          ]
+                          "enum": ["planned", "committed", "recurring", "paid", "cancelled"]
                         },
                         "amount": {
                           "type": "integer",
@@ -4611,17 +4219,11 @@
                         },
                         "currency": {
                           "type": "string",
-                          "enum": [
-                            "PHP"
-                          ]
+                          "enum": ["PHP"]
                         },
                         "confidence": {
                           "type": "string",
-                          "enum": [
-                            "confirmed",
-                            "likely",
-                            "uncertain"
-                          ]
+                          "enum": ["confirmed", "likely", "uncertain"]
                         },
                         "accountId": {
                           "nullable": true,
@@ -4678,10 +4280,7 @@
                             "monthEndRule": {
                               "default": "clamp",
                               "type": "string",
-                              "enum": [
-                                "clamp",
-                                "last_day"
-                              ]
+                              "enum": ["clamp", "last_day"]
                             },
                             "endDate": {
                               "default": null,
@@ -4764,10 +4363,7 @@
                         },
                         "direction": {
                           "type": "string",
-                          "enum": [
-                            "inflow",
-                            "outflow"
-                          ]
+                          "enum": ["inflow", "outflow"]
                         },
                         "kind": {
                           "type": "string",
@@ -4783,13 +4379,7 @@
                         },
                         "status": {
                           "type": "string",
-                          "enum": [
-                            "planned",
-                            "committed",
-                            "recurring",
-                            "paid",
-                            "cancelled"
-                          ]
+                          "enum": ["planned", "committed", "recurring", "paid", "cancelled"]
                         },
                         "amount": {
                           "type": "integer",
@@ -4813,17 +4403,11 @@
                         },
                         "currency": {
                           "type": "string",
-                          "enum": [
-                            "PHP"
-                          ]
+                          "enum": ["PHP"]
                         },
                         "confidence": {
                           "type": "string",
-                          "enum": [
-                            "confirmed",
-                            "likely",
-                            "uncertain"
-                          ]
+                          "enum": ["confirmed", "likely", "uncertain"]
                         },
                         "accountId": {
                           "nullable": true,
@@ -4880,10 +4464,7 @@
                             "monthEndRule": {
                               "default": "clamp",
                               "type": "string",
-                              "enum": [
-                                "clamp",
-                                "last_day"
-                              ]
+                              "enum": ["clamp", "last_day"]
                             },
                             "endDate": {
                               "default": null,
@@ -4954,10 +4535,7 @@
                       "additionalProperties": false
                     }
                   },
-                  "required": [
-                    "original",
-                    "created"
-                  ],
+                  "required": ["original", "created"],
                   "additionalProperties": false
                 }
               }
@@ -4969,9 +4547,7 @@
     "/api/v1/scheduled-events/{id}/mark-paid": {
       "post": {
         "summary": "Convert an occurrence into an actual transaction (no double counting)",
-        "tags": [
-          "planner"
-        ],
+        "tags": ["planner"],
         "requestBody": {
           "required": true,
           "content": {
@@ -5010,10 +4586,7 @@
                     "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
                   }
                 },
-                "required": [
-                  "occurrenceDate",
-                  "transactionId"
-                ]
+                "required": ["occurrenceDate", "transactionId"]
               }
             }
           }
@@ -5045,13 +4618,7 @@
                     },
                     "type": {
                       "type": "string",
-                      "enum": [
-                        "income",
-                        "expense",
-                        "transfer",
-                        "refund",
-                        "adjustment"
-                      ]
+                      "enum": ["income", "expense", "transfer", "refund", "adjustment"]
                     },
                     "amount": {
                       "type": "integer",
@@ -5154,13 +4721,7 @@
                     },
                     "type": {
                       "type": "string",
-                      "enum": [
-                        "income",
-                        "expense",
-                        "transfer",
-                        "refund",
-                        "adjustment"
-                      ]
+                      "enum": ["income", "expense", "transfer", "refund", "adjustment"]
                     },
                     "amount": {
                       "type": "integer",
@@ -5255,9 +4816,7 @@
     "/api/v1/budgets": {
       "get": {
         "summary": "Monthly budgets with utilisation and spending pace",
-        "tags": [
-          "budgets"
-        ],
+        "tags": ["budgets"],
         "parameters": [
           {
             "schema": {
@@ -5334,12 +4893,7 @@
                           },
                           "state": {
                             "type": "string",
-                            "enum": [
-                              "ok",
-                              "approaching",
-                              "over_pace",
-                              "exceeded"
-                            ]
+                            "enum": ["ok", "approaching", "over_pace", "exceeded"]
                           }
                         },
                         "required": [
@@ -5378,9 +4932,7 @@
         }
       },
       "post": {
-        "tags": [
-          "budgets"
-        ],
+        "tags": ["budgets"],
         "requestBody": {
           "required": true,
           "content": {
@@ -5406,10 +4958,7 @@
                     "maximum": 100000000000000
                   }
                 },
-                "required": [
-                  "categoryId",
-                  "amount"
-                ]
+                "required": ["categoryId", "amount"]
               }
             }
           }
@@ -5477,12 +5026,7 @@
                         },
                         "state": {
                           "type": "string",
-                          "enum": [
-                            "ok",
-                            "approaching",
-                            "over_pace",
-                            "exceeded"
-                          ]
+                          "enum": ["ok", "approaching", "over_pace", "exceeded"]
                         }
                       },
                       "required": [
@@ -5522,9 +5066,7 @@
     },
     "/api/v1/budgets/{id}": {
       "patch": {
-        "tags": [
-          "budgets"
-        ],
+        "tags": ["budgets"],
         "requestBody": {
           "required": true,
           "content": {
@@ -5539,9 +5081,7 @@
                     "maximum": 100000000000000
                   }
                 },
-                "required": [
-                  "amount"
-                ]
+                "required": ["amount"]
               }
             }
           }
@@ -5621,12 +5161,7 @@
                         },
                         "state": {
                           "type": "string",
-                          "enum": [
-                            "ok",
-                            "approaching",
-                            "over_pace",
-                            "exceeded"
-                          ]
+                          "enum": ["ok", "approaching", "over_pace", "exceeded"]
                         }
                       },
                       "required": [
@@ -5664,9 +5199,7 @@
         }
       },
       "delete": {
-        "tags": [
-          "budgets"
-        ],
+        "tags": ["budgets"],
         "parameters": [
           {
             "schema": {
@@ -5687,9 +5220,7 @@
                 "schema": {
                   "type": "string",
                   "nullable": true,
-                  "enum": [
-                    null
-                  ]
+                  "enum": [null]
                 }
               }
             }
@@ -5700,9 +5231,7 @@
     "/api/v1/goals": {
       "get": {
         "summary": "Savings goals with progress and projected completion",
-        "tags": [
-          "goals"
-        ],
+        "tags": ["goals"],
         "responses": {
           "200": {
             "description": "Default Response",
@@ -5846,9 +5375,7 @@
         }
       },
       "post": {
-        "tags": [
-          "goals"
-        ],
+        "tags": ["goals"],
         "requestBody": {
           "required": true,
           "content": {
@@ -5906,11 +5433,7 @@
                     "maximum": 100000000000000
                   }
                 },
-                "required": [
-                  "name",
-                  "kind",
-                  "targetAmount"
-                ]
+                "required": ["name", "kind", "targetAmount"]
               }
             }
           }
@@ -6057,9 +5580,7 @@
     },
     "/api/v1/goals/{id}": {
       "patch": {
-        "tags": [
-          "goals"
-        ],
+        "tags": ["goals"],
         "requestBody": {
           "required": true,
           "content": {
@@ -6266,9 +5787,7 @@
         }
       },
       "delete": {
-        "tags": [
-          "goals"
-        ],
+        "tags": ["goals"],
         "parameters": [
           {
             "schema": {
@@ -6289,9 +5808,7 @@
                 "schema": {
                   "type": "string",
                   "nullable": true,
-                  "enum": [
-                    null
-                  ]
+                  "enum": [null]
                 }
               }
             }
@@ -6301,9 +5818,7 @@
     },
     "/api/v1/goals/{id}/allocations": {
       "get": {
-        "tags": [
-          "goals"
-        ],
+        "tags": ["goals"],
         "parameters": [
           {
             "schema": {
@@ -6353,14 +5868,7 @@
                         "type": "string"
                       }
                     },
-                    "required": [
-                      "id",
-                      "goalId",
-                      "amount",
-                      "allocatedOn",
-                      "note",
-                      "createdAt"
-                    ],
+                    "required": ["id", "goalId", "amount", "allocatedOn", "note", "createdAt"],
                     "additionalProperties": false
                   }
                 }
@@ -6371,9 +5879,7 @@
       },
       "post": {
         "summary": "Allocate (or withdraw, with a negative amount) money towards a goal",
-        "tags": [
-          "goals"
-        ],
+        "tags": ["goals"],
         "description": "Allocations earmark money you already own; they are not expenses and do not change balances.",
         "requestBody": {
           "required": true,
@@ -6402,10 +5908,7 @@
                     "maxLength": 200
                   }
                 },
-                "required": [
-                  "amount",
-                  "allocatedOn"
-                ]
+                "required": ["amount", "allocatedOn"]
               }
             }
           }
@@ -6457,14 +5960,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "id",
-                    "goalId",
-                    "amount",
-                    "allocatedOn",
-                    "note",
-                    "createdAt"
-                  ],
+                  "required": ["id", "goalId", "amount", "allocatedOn", "note", "createdAt"],
                   "additionalProperties": false
                 }
               }
@@ -6504,14 +6000,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "id",
-                    "goalId",
-                    "amount",
-                    "allocatedOn",
-                    "note",
-                    "createdAt"
-                  ],
+                  "required": ["id", "goalId", "amount", "allocatedOn", "note", "createdAt"],
                   "additionalProperties": false
                 }
               }
@@ -6522,9 +6011,7 @@
     },
     "/api/v1/goals/{id}/allocations/{allocationId}": {
       "delete": {
-        "tags": [
-          "goals"
-        ],
+        "tags": ["goals"],
         "parameters": [
           {
             "schema": {
@@ -6555,9 +6042,7 @@
                 "schema": {
                   "type": "string",
                   "nullable": true,
-                  "enum": [
-                    null
-                  ]
+                  "enum": [null]
                 }
               }
             }
@@ -6568,9 +6053,7 @@
     "/api/v1/forecast": {
       "get": {
         "summary": "Actual balance history plus a daily projection",
-        "tags": [
-          "forecasts"
-        ],
+        "tags": ["forecasts"],
         "description": "History is computed from recorded transactions only. The projection starts from the actual balance today and adds scheduled inflows/outflows and remaining budgets for the chosen mode.",
         "parameters": [
           {
@@ -6588,11 +6071,7 @@
             "schema": {
               "default": "expected",
               "type": "string",
-              "enum": [
-                "conservative",
-                "expected",
-                "optimistic"
-              ]
+              "enum": ["conservative", "expected", "optimistic"]
             },
             "in": "query",
             "name": "mode",
@@ -6613,10 +6092,7 @@
             "schema": {
               "default": "true",
               "type": "string",
-              "enum": [
-                "true",
-                "false"
-              ]
+              "enum": ["true", "false"]
             },
             "in": "query",
             "name": "includeBudgetedSpending",
@@ -6646,10 +6122,7 @@
                             "maximum": 100000000000000
                           }
                         },
-                        "required": [
-                          "date",
-                          "balance"
-                        ],
+                        "required": ["date", "balance"],
                         "additionalProperties": false
                       }
                     },
@@ -6666,11 +6139,7 @@
                         },
                         "mode": {
                           "type": "string",
-                          "enum": [
-                            "conservative",
-                            "expected",
-                            "optimistic"
-                          ]
+                          "enum": ["conservative", "expected", "optimistic"]
                         },
                         "horizonDays": {
                           "type": "integer",
@@ -6741,18 +6210,11 @@
                                     },
                                     "direction": {
                                       "type": "string",
-                                      "enum": [
-                                        "inflow",
-                                        "outflow"
-                                      ]
+                                      "enum": ["inflow", "outflow"]
                                     },
                                     "confidence": {
                                       "type": "string",
-                                      "enum": [
-                                        "confirmed",
-                                        "likely",
-                                        "uncertain"
-                                      ]
+                                      "enum": ["confirmed", "likely", "uncertain"]
                                     },
                                     "amount": {
                                       "type": "integer",
@@ -6781,10 +6243,7 @@
                                           "maximum": 9007199254740991
                                         }
                                       },
-                                      "required": [
-                                        "index",
-                                        "count"
-                                      ],
+                                      "required": ["index", "count"],
                                       "additionalProperties": false
                                     }
                                   },
@@ -6832,10 +6291,7 @@
                               "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
                             }
                           },
-                          "required": [
-                            "balance",
-                            "date"
-                          ],
+                          "required": ["balance", "date"],
                           "additionalProperties": false
                         },
                         "monthEnd": {
@@ -6852,10 +6308,7 @@
                               "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
                             }
                           },
-                          "required": [
-                            "balance",
-                            "date"
-                          ],
+                          "required": ["balance", "date"],
                           "additionalProperties": false
                         },
                         "totals": {
@@ -6877,11 +6330,7 @@
                               "maximum": 100000000000000
                             }
                           },
-                          "required": [
-                            "inflow",
-                            "outflow",
-                            "budgetedSpending"
-                          ],
+                          "required": ["inflow", "outflow", "budgetedSpending"],
                           "additionalProperties": false
                         },
                         "firstShortfallDate": {
@@ -6913,10 +6362,7 @@
                               "maximum": 9007199254740991
                             }
                           },
-                          "required": [
-                            "amount",
-                            "count"
-                          ],
+                          "required": ["amount", "count"],
                           "additionalProperties": false
                         },
                         "assumptions": {
@@ -6947,10 +6393,7 @@
                       "additionalProperties": false
                     }
                   },
-                  "required": [
-                    "history",
-                    "forecast"
-                  ],
+                  "required": ["history", "forecast"],
                   "additionalProperties": false
                 }
               }
@@ -6962,9 +6405,7 @@
     "/api/v1/forecast/scenarios": {
       "post": {
         "summary": "Compare what-if scenarios against the baseline",
-        "tags": [
-          "forecasts"
-        ],
+        "tags": ["forecasts"],
         "requestBody": {
           "required": true,
           "content": {
@@ -6981,11 +6422,7 @@
                   "mode": {
                     "default": "expected",
                     "type": "string",
-                    "enum": [
-                      "conservative",
-                      "expected",
-                      "optimistic"
-                    ]
+                    "enum": ["conservative", "expected", "optimistic"]
                   },
                   "scenarios": {
                     "minItems": 1,
@@ -6998,26 +6435,20 @@
                           "properties": {
                             "type": {
                               "type": "string",
-                              "enum": [
-                                "baseline"
-                              ]
+                              "enum": ["baseline"]
                             },
                             "label": {
                               "type": "string"
                             }
                           },
-                          "required": [
-                            "type"
-                          ]
+                          "required": ["type"]
                         },
                         {
                           "type": "object",
                           "properties": {
                             "type": {
                               "type": "string",
-                              "enum": [
-                                "salary_delayed"
-                              ]
+                              "enum": ["salary_delayed"]
                             },
                             "days": {
                               "type": "integer",
@@ -7036,19 +6467,14 @@
                               "type": "string"
                             }
                           },
-                          "required": [
-                            "type",
-                            "days"
-                          ]
+                          "required": ["type", "days"]
                         },
                         {
                           "type": "object",
                           "properties": {
                             "type": {
                               "type": "string",
-                              "enum": [
-                                "income_lost"
-                              ]
+                              "enum": ["income_lost"]
                             },
                             "fromDate": {
                               "type": "string",
@@ -7066,19 +6492,14 @@
                               "type": "string"
                             }
                           },
-                          "required": [
-                            "type",
-                            "fromDate"
-                          ]
+                          "required": ["type", "fromDate"]
                         },
                         {
                           "type": "object",
                           "properties": {
                             "type": {
                               "type": "string",
-                              "enum": [
-                                "purchase_added"
-                              ]
+                              "enum": ["purchase_added"]
                             },
                             "amount": {
                               "type": "integer",
@@ -7116,20 +6537,14 @@
                               "type": "string"
                             }
                           },
-                          "required": [
-                            "type",
-                            "amount",
-                            "date"
-                          ]
+                          "required": ["type", "amount", "date"]
                         },
                         {
                           "type": "object",
                           "properties": {
                             "type": {
                               "type": "string",
-                              "enum": [
-                                "purchase_postponed"
-                              ]
+                              "enum": ["purchase_postponed"]
                             },
                             "eventId": {
                               "type": "string",
@@ -7144,20 +6559,14 @@
                               "type": "string"
                             }
                           },
-                          "required": [
-                            "type",
-                            "eventId",
-                            "newDate"
-                          ]
+                          "required": ["type", "eventId", "newDate"]
                         },
                         {
                           "type": "object",
                           "properties": {
                             "type": {
                               "type": "string",
-                              "enum": [
-                                "spending_reduced"
-                              ]
+                              "enum": ["spending_reduced"]
                             },
                             "percent": {
                               "type": "integer",
@@ -7168,18 +6577,13 @@
                               "type": "string"
                             }
                           },
-                          "required": [
-                            "type",
-                            "percent"
-                          ]
+                          "required": ["type", "percent"]
                         }
                       ]
                     }
                   }
                 },
-                "required": [
-                  "scenarios"
-                ]
+                "required": ["scenarios"]
               }
             }
           }
@@ -7207,17 +6611,13 @@
                                 "properties": {
                                   "type": {
                                     "type": "string",
-                                    "enum": [
-                                      "baseline"
-                                    ]
+                                    "enum": ["baseline"]
                                   },
                                   "label": {
                                     "type": "string"
                                   }
                                 },
-                                "required": [
-                                  "type"
-                                ],
+                                "required": ["type"],
                                 "additionalProperties": false
                               },
                               {
@@ -7225,9 +6625,7 @@
                                 "properties": {
                                   "type": {
                                     "type": "string",
-                                    "enum": [
-                                      "salary_delayed"
-                                    ]
+                                    "enum": ["salary_delayed"]
                                   },
                                   "days": {
                                     "type": "integer",
@@ -7246,10 +6644,7 @@
                                     "type": "string"
                                   }
                                 },
-                                "required": [
-                                  "type",
-                                  "days"
-                                ],
+                                "required": ["type", "days"],
                                 "additionalProperties": false
                               },
                               {
@@ -7257,9 +6652,7 @@
                                 "properties": {
                                   "type": {
                                     "type": "string",
-                                    "enum": [
-                                      "income_lost"
-                                    ]
+                                    "enum": ["income_lost"]
                                   },
                                   "fromDate": {
                                     "type": "string",
@@ -7277,10 +6670,7 @@
                                     "type": "string"
                                   }
                                 },
-                                "required": [
-                                  "type",
-                                  "fromDate"
-                                ],
+                                "required": ["type", "fromDate"],
                                 "additionalProperties": false
                               },
                               {
@@ -7288,9 +6678,7 @@
                                 "properties": {
                                   "type": {
                                     "type": "string",
-                                    "enum": [
-                                      "purchase_added"
-                                    ]
+                                    "enum": ["purchase_added"]
                                   },
                                   "amount": {
                                     "type": "integer",
@@ -7328,11 +6716,7 @@
                                     "type": "string"
                                   }
                                 },
-                                "required": [
-                                  "type",
-                                  "amount",
-                                  "date"
-                                ],
+                                "required": ["type", "amount", "date"],
                                 "additionalProperties": false
                               },
                               {
@@ -7340,9 +6724,7 @@
                                 "properties": {
                                   "type": {
                                     "type": "string",
-                                    "enum": [
-                                      "purchase_postponed"
-                                    ]
+                                    "enum": ["purchase_postponed"]
                                   },
                                   "eventId": {
                                     "type": "string",
@@ -7357,11 +6739,7 @@
                                     "type": "string"
                                   }
                                 },
-                                "required": [
-                                  "type",
-                                  "eventId",
-                                  "newDate"
-                                ],
+                                "required": ["type", "eventId", "newDate"],
                                 "additionalProperties": false
                               },
                               {
@@ -7369,9 +6747,7 @@
                                 "properties": {
                                   "type": {
                                     "type": "string",
-                                    "enum": [
-                                      "spending_reduced"
-                                    ]
+                                    "enum": ["spending_reduced"]
                                   },
                                   "percent": {
                                     "type": "integer",
@@ -7382,10 +6758,7 @@
                                     "type": "string"
                                   }
                                 },
-                                "required": [
-                                  "type",
-                                  "percent"
-                                ],
+                                "required": ["type", "percent"],
                                 "additionalProperties": false
                               }
                             ]
@@ -7403,11 +6776,7 @@
                               },
                               "mode": {
                                 "type": "string",
-                                "enum": [
-                                  "conservative",
-                                  "expected",
-                                  "optimistic"
-                                ]
+                                "enum": ["conservative", "expected", "optimistic"]
                               },
                               "horizonDays": {
                                 "type": "integer",
@@ -7478,18 +6847,11 @@
                                           },
                                           "direction": {
                                             "type": "string",
-                                            "enum": [
-                                              "inflow",
-                                              "outflow"
-                                            ]
+                                            "enum": ["inflow", "outflow"]
                                           },
                                           "confidence": {
                                             "type": "string",
-                                            "enum": [
-                                              "confirmed",
-                                              "likely",
-                                              "uncertain"
-                                            ]
+                                            "enum": ["confirmed", "likely", "uncertain"]
                                           },
                                           "amount": {
                                             "type": "integer",
@@ -7518,10 +6880,7 @@
                                                 "maximum": 9007199254740991
                                               }
                                             },
-                                            "required": [
-                                              "index",
-                                              "count"
-                                            ],
+                                            "required": ["index", "count"],
                                             "additionalProperties": false
                                           }
                                         },
@@ -7569,10 +6928,7 @@
                                     "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
                                   }
                                 },
-                                "required": [
-                                  "balance",
-                                  "date"
-                                ],
+                                "required": ["balance", "date"],
                                 "additionalProperties": false
                               },
                               "monthEnd": {
@@ -7589,10 +6945,7 @@
                                     "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
                                   }
                                 },
-                                "required": [
-                                  "balance",
-                                  "date"
-                                ],
+                                "required": ["balance", "date"],
                                 "additionalProperties": false
                               },
                               "totals": {
@@ -7614,11 +6967,7 @@
                                     "maximum": 100000000000000
                                   }
                                 },
-                                "required": [
-                                  "inflow",
-                                  "outflow",
-                                  "budgetedSpending"
-                                ],
+                                "required": ["inflow", "outflow", "budgetedSpending"],
                                 "additionalProperties": false
                               },
                               "firstShortfallDate": {
@@ -7650,10 +6999,7 @@
                                     "maximum": 9007199254740991
                                   }
                                 },
-                                "required": [
-                                  "amount",
-                                  "count"
-                                ],
+                                "required": ["amount", "count"],
                                 "additionalProperties": false
                               },
                               "assumptions": {
@@ -7697,26 +7043,16 @@
                                 "maximum": 100000000000000
                               }
                             },
-                            "required": [
-                              "endingBalance",
-                              "lowestBalance"
-                            ],
+                            "required": ["endingBalance", "lowestBalance"],
                             "additionalProperties": false
                           }
                         },
-                        "required": [
-                          "label",
-                          "scenario",
-                          "result",
-                          "delta"
-                        ],
+                        "required": ["label", "scenario", "result", "delta"],
                         "additionalProperties": false
                       }
                     }
                   },
-                  "required": [
-                    "comparisons"
-                  ],
+                  "required": ["comparisons"],
                   "additionalProperties": false
                 }
               }
@@ -7728,9 +7064,7 @@
     "/api/v1/forecast/affordability": {
       "post": {
         "summary": "Can I afford this? Simulate a purchase without saving anything",
-        "tags": [
-          "forecasts"
-        ],
+        "tags": ["forecasts"],
         "requestBody": {
           "required": true,
           "content": {
@@ -7777,10 +7111,7 @@
                     "maximum": 730
                   }
                 },
-                "required": [
-                  "amount",
-                  "date"
-                ]
+                "required": ["amount", "date"]
               }
             }
           }
@@ -7832,10 +7163,7 @@
                           "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
                         }
                       },
-                      "required": [
-                        "balance",
-                        "date"
-                      ],
+                      "required": ["balance", "date"],
                       "additionalProperties": false
                     },
                     "baselineLowest": {
@@ -7851,10 +7179,7 @@
                           "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
                         }
                       },
-                      "required": [
-                        "balance",
-                        "date"
-                      ],
+                      "required": ["balance", "date"],
                       "additionalProperties": false
                     },
                     "conservativeLowest": {
@@ -7870,10 +7195,7 @@
                           "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
                         }
                       },
-                      "required": [
-                        "balance",
-                        "date"
-                      ],
+                      "required": ["balance", "date"],
                       "additionalProperties": false
                     },
                     "safetyBuffer": {
@@ -7903,11 +7225,7 @@
                           "maximum": 100000000000000
                         }
                       },
-                      "required": [
-                        "reserved",
-                        "compromised",
-                        "shortfall"
-                      ],
+                      "required": ["reserved", "compromised", "shortfall"],
                       "additionalProperties": false
                     },
                     "firstShortfallDate": {
@@ -7938,12 +7256,7 @@
                             "maximum": 100000000000000
                           }
                         },
-                        "required": [
-                          "date",
-                          "name",
-                          "amount",
-                          "balanceAfter"
-                        ],
+                        "required": ["date", "name", "amount", "balanceAfter"],
                         "additionalProperties": false
                       }
                     },
@@ -7966,11 +7279,7 @@
                         },
                         "mode": {
                           "type": "string",
-                          "enum": [
-                            "conservative",
-                            "expected",
-                            "optimistic"
-                          ]
+                          "enum": ["conservative", "expected", "optimistic"]
                         },
                         "horizonDays": {
                           "type": "integer",
@@ -8041,18 +7350,11 @@
                                     },
                                     "direction": {
                                       "type": "string",
-                                      "enum": [
-                                        "inflow",
-                                        "outflow"
-                                      ]
+                                      "enum": ["inflow", "outflow"]
                                     },
                                     "confidence": {
                                       "type": "string",
-                                      "enum": [
-                                        "confirmed",
-                                        "likely",
-                                        "uncertain"
-                                      ]
+                                      "enum": ["confirmed", "likely", "uncertain"]
                                     },
                                     "amount": {
                                       "type": "integer",
@@ -8081,10 +7383,7 @@
                                           "maximum": 9007199254740991
                                         }
                                       },
-                                      "required": [
-                                        "index",
-                                        "count"
-                                      ],
+                                      "required": ["index", "count"],
                                       "additionalProperties": false
                                     }
                                   },
@@ -8132,10 +7431,7 @@
                               "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
                             }
                           },
-                          "required": [
-                            "balance",
-                            "date"
-                          ],
+                          "required": ["balance", "date"],
                           "additionalProperties": false
                         },
                         "monthEnd": {
@@ -8152,10 +7448,7 @@
                               "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
                             }
                           },
-                          "required": [
-                            "balance",
-                            "date"
-                          ],
+                          "required": ["balance", "date"],
                           "additionalProperties": false
                         },
                         "totals": {
@@ -8177,11 +7470,7 @@
                               "maximum": 100000000000000
                             }
                           },
-                          "required": [
-                            "inflow",
-                            "outflow",
-                            "budgetedSpending"
-                          ],
+                          "required": ["inflow", "outflow", "budgetedSpending"],
                           "additionalProperties": false
                         },
                         "firstShortfallDate": {
@@ -8213,10 +7502,7 @@
                               "maximum": 9007199254740991
                             }
                           },
-                          "required": [
-                            "amount",
-                            "count"
-                          ],
+                          "required": ["amount", "count"],
                           "additionalProperties": false
                         },
                         "assumptions": {
@@ -8259,11 +7545,7 @@
                         },
                         "mode": {
                           "type": "string",
-                          "enum": [
-                            "conservative",
-                            "expected",
-                            "optimistic"
-                          ]
+                          "enum": ["conservative", "expected", "optimistic"]
                         },
                         "horizonDays": {
                           "type": "integer",
@@ -8334,18 +7616,11 @@
                                     },
                                     "direction": {
                                       "type": "string",
-                                      "enum": [
-                                        "inflow",
-                                        "outflow"
-                                      ]
+                                      "enum": ["inflow", "outflow"]
                                     },
                                     "confidence": {
                                       "type": "string",
-                                      "enum": [
-                                        "confirmed",
-                                        "likely",
-                                        "uncertain"
-                                      ]
+                                      "enum": ["confirmed", "likely", "uncertain"]
                                     },
                                     "amount": {
                                       "type": "integer",
@@ -8374,10 +7649,7 @@
                                           "maximum": 9007199254740991
                                         }
                                       },
-                                      "required": [
-                                        "index",
-                                        "count"
-                                      ],
+                                      "required": ["index", "count"],
                                       "additionalProperties": false
                                     }
                                   },
@@ -8425,10 +7697,7 @@
                               "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
                             }
                           },
-                          "required": [
-                            "balance",
-                            "date"
-                          ],
+                          "required": ["balance", "date"],
                           "additionalProperties": false
                         },
                         "monthEnd": {
@@ -8445,10 +7714,7 @@
                               "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
                             }
                           },
-                          "required": [
-                            "balance",
-                            "date"
-                          ],
+                          "required": ["balance", "date"],
                           "additionalProperties": false
                         },
                         "totals": {
@@ -8470,11 +7736,7 @@
                               "maximum": 100000000000000
                             }
                           },
-                          "required": [
-                            "inflow",
-                            "outflow",
-                            "budgetedSpending"
-                          ],
+                          "required": ["inflow", "outflow", "budgetedSpending"],
                           "additionalProperties": false
                         },
                         "firstShortfallDate": {
@@ -8506,10 +7768,7 @@
                               "maximum": 9007199254740991
                             }
                           },
-                          "required": [
-                            "amount",
-                            "count"
-                          ],
+                          "required": ["amount", "count"],
                           "additionalProperties": false
                         },
                         "assumptions": {
@@ -8569,19 +7828,13 @@
     "/api/v1/alerts": {
       "get": {
         "summary": "Evaluate overspending and cash-flow warnings",
-        "tags": [
-          "alerts"
-        ],
+        "tags": ["alerts"],
         "parameters": [
           {
             "schema": {
               "default": "active",
               "type": "string",
-              "enum": [
-                "active",
-                "dismissed",
-                "resolved"
-              ]
+              "enum": ["active", "dismissed", "resolved"]
             },
             "in": "query",
             "name": "status",
@@ -8618,11 +7871,7 @@
                       },
                       "severity": {
                         "type": "string",
-                        "enum": [
-                          "info",
-                          "warning",
-                          "critical"
-                        ]
+                        "enum": ["info", "warning", "critical"]
                       },
                       "fingerprint": {
                         "type": "string"
@@ -8653,11 +7902,7 @@
                       },
                       "status": {
                         "type": "string",
-                        "enum": [
-                          "active",
-                          "dismissed",
-                          "resolved"
-                        ]
+                        "enum": ["active", "dismissed", "resolved"]
                       },
                       "firstSeenAt": {
                         "type": "string"
@@ -8692,9 +7937,7 @@
     },
     "/api/v1/alerts/{id}/dismiss": {
       "post": {
-        "tags": [
-          "alerts"
-        ],
+        "tags": ["alerts"],
         "parameters": [
           {
             "schema": {
@@ -8735,11 +7978,7 @@
                     },
                     "severity": {
                       "type": "string",
-                      "enum": [
-                        "info",
-                        "warning",
-                        "critical"
-                      ]
+                      "enum": ["info", "warning", "critical"]
                     },
                     "fingerprint": {
                       "type": "string"
@@ -8770,11 +8009,7 @@
                     },
                     "status": {
                       "type": "string",
-                      "enum": [
-                        "active",
-                        "dismissed",
-                        "resolved"
-                      ]
+                      "enum": ["active", "dismissed", "resolved"]
                     },
                     "firstSeenAt": {
                       "type": "string"
@@ -8809,9 +8044,7 @@
     "/api/v1/dashboard": {
       "get": {
         "summary": "Overview: actual position, this month, safe-to-spend, upcoming items and health",
-        "tags": [
-          "dashboard"
-        ],
+        "tags": ["dashboard"],
         "responses": {
           "200": {
             "description": "Default Response",
@@ -8848,12 +8081,7 @@
                           "maximum": 100000000000000
                         }
                       },
-                      "required": [
-                        "net",
-                        "assets",
-                        "liabilities",
-                        "liquid"
-                      ],
+                      "required": ["net", "assets", "liabilities", "liquid"],
                       "additionalProperties": false
                     },
                     "month": {
@@ -8883,13 +8111,7 @@
                           "maximum": 100000000000000
                         }
                       },
-                      "required": [
-                        "key",
-                        "income",
-                        "expenses",
-                        "refunds",
-                        "netSpending"
-                      ],
+                      "required": ["key", "income", "expenses", "refunds", "netSpending"],
                       "additionalProperties": false
                     },
                     "budget": {
@@ -8917,12 +8139,7 @@
                           "maximum": 100000000000000
                         }
                       },
-                      "required": [
-                        "limit",
-                        "spent",
-                        "remaining",
-                        "dailyAllowance"
-                      ],
+                      "required": ["limit", "spent", "remaining", "dailyAllowance"],
                       "additionalProperties": false
                     },
                     "safeToSpend": {
@@ -8954,10 +8171,7 @@
                           "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
                         }
                       },
-                      "required": [
-                        "balance",
-                        "date"
-                      ],
+                      "required": ["balance", "date"],
                       "additionalProperties": false
                     },
                     "nextIncome": {
@@ -8974,10 +8188,7 @@
                         },
                         "direction": {
                           "type": "string",
-                          "enum": [
-                            "inflow",
-                            "outflow"
-                          ]
+                          "enum": ["inflow", "outflow"]
                         },
                         "kind": {
                           "type": "string",
@@ -8993,21 +8204,11 @@
                         },
                         "status": {
                           "type": "string",
-                          "enum": [
-                            "planned",
-                            "committed",
-                            "recurring",
-                            "paid",
-                            "cancelled"
-                          ]
+                          "enum": ["planned", "committed", "recurring", "paid", "cancelled"]
                         },
                         "confidence": {
                           "type": "string",
-                          "enum": [
-                            "confirmed",
-                            "likely",
-                            "uncertain"
-                          ]
+                          "enum": ["confirmed", "likely", "uncertain"]
                         },
                         "accountId": {
                           "nullable": true,
@@ -9118,10 +8319,7 @@
                           },
                           "direction": {
                             "type": "string",
-                            "enum": [
-                              "inflow",
-                              "outflow"
-                            ]
+                            "enum": ["inflow", "outflow"]
                           },
                           "kind": {
                             "type": "string",
@@ -9137,21 +8335,11 @@
                           },
                           "status": {
                             "type": "string",
-                            "enum": [
-                              "planned",
-                              "committed",
-                              "recurring",
-                              "paid",
-                              "cancelled"
-                            ]
+                            "enum": ["planned", "committed", "recurring", "paid", "cancelled"]
                           },
                           "confidence": {
                             "type": "string",
-                            "enum": [
-                              "confirmed",
-                              "likely",
-                              "uncertain"
-                            ]
+                            "enum": ["confirmed", "likely", "uncertain"]
                           },
                           "accountId": {
                             "nullable": true,
@@ -9267,11 +8455,7 @@
                           "maximum": 9007199254740991
                         }
                       },
-                      "required": [
-                        "target",
-                        "current",
-                        "count"
-                      ],
+                      "required": ["target", "current", "count"],
                       "additionalProperties": false
                     },
                     "spendingByCategory": {
@@ -9291,10 +8475,7 @@
                             "maximum": 100000000000000
                           }
                         },
-                        "required": [
-                          "categoryId",
-                          "amount"
-                        ],
+                        "required": ["categoryId", "amount"],
                         "additionalProperties": false
                       }
                     },
@@ -9308,12 +8489,7 @@
                         },
                         "label": {
                           "type": "string",
-                          "enum": [
-                            "strong",
-                            "stable",
-                            "watch",
-                            "at_risk"
-                          ]
+                          "enum": ["strong", "stable", "watch", "at_risk"]
                         },
                         "factors": {
                           "type": "array",
@@ -9327,19 +8503,12 @@
                                 "type": "boolean"
                               }
                             },
-                            "required": [
-                              "label",
-                              "ok"
-                            ],
+                            "required": ["label", "ok"],
                             "additionalProperties": false
                           }
                         }
                       },
-                      "required": [
-                        "score",
-                        "label",
-                        "factors"
-                      ],
+                      "required": ["score", "label", "factors"],
                       "additionalProperties": false
                     },
                     "alertCounts": {
@@ -9361,11 +8530,7 @@
                           "maximum": 9007199254740991
                         }
                       },
-                      "required": [
-                        "critical",
-                        "warning",
-                        "info"
-                      ],
+                      "required": ["critical", "warning", "info"],
                       "additionalProperties": false
                     },
                     "isEmpty": {
@@ -9400,9 +8565,7 @@
     "/api/v1/sync/push": {
       "post": {
         "summary": "Apply queued offline operations (idempotent per opId)",
-        "tags": [
-          "sync"
-        ],
+        "tags": ["sync"],
         "description": "Operations are applied in order. Replaying an opId returns status \"duplicate\" without re-applying. Updates carrying a stale baseUpdatedAt return \"conflict\" with the server copy (server wins). Validation failures return \"rejected\" so clients stop retrying them.",
         "requestBody": {
           "required": true,
@@ -9427,28 +8590,18 @@
                             },
                             "entity": {
                               "type": "string",
-                              "enum": [
-                                "transaction"
-                              ]
+                              "enum": ["transaction"]
                             },
                             "op": {
                               "type": "string",
-                              "enum": [
-                                "create"
-                              ]
+                              "enum": ["create"]
                             },
                             "data": {
                               "type": "object",
                               "properties": {
                                 "type": {
                                   "type": "string",
-                                  "enum": [
-                                    "income",
-                                    "expense",
-                                    "transfer",
-                                    "refund",
-                                    "adjustment"
-                                  ]
+                                  "enum": ["income", "expense", "transfer", "refund", "adjustment"]
                                 },
                                 "amount": {
                                   "type": "integer",
@@ -9513,25 +8666,13 @@
                                   "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
                                 }
                               },
-                              "required": [
-                                "type",
-                                "amount",
-                                "accountId",
-                                "occurredOn",
-                                "id"
-                              ]
+                              "required": ["type", "amount", "accountId", "occurredOn", "id"]
                             },
                             "clientUpdatedAt": {
                               "type": "string"
                             }
                           },
-                          "required": [
-                            "opId",
-                            "entity",
-                            "op",
-                            "data",
-                            "clientUpdatedAt"
-                          ]
+                          "required": ["opId", "entity", "op", "data", "clientUpdatedAt"]
                         },
                         {
                           "type": "object",
@@ -9543,15 +8684,11 @@
                             },
                             "entity": {
                               "type": "string",
-                              "enum": [
-                                "transaction"
-                              ]
+                              "enum": ["transaction"]
                             },
                             "op": {
                               "type": "string",
-                              "enum": [
-                                "update"
-                              ]
+                              "enum": ["update"]
                             },
                             "id": {
                               "type": "string",
@@ -9563,13 +8700,7 @@
                               "properties": {
                                 "type": {
                                   "type": "string",
-                                  "enum": [
-                                    "income",
-                                    "expense",
-                                    "transfer",
-                                    "refund",
-                                    "adjustment"
-                                  ]
+                                  "enum": ["income", "expense", "transfer", "refund", "adjustment"]
                                 },
                                 "amount": {
                                   "type": "integer",
@@ -9625,14 +8756,7 @@
                               "type": "string"
                             }
                           },
-                          "required": [
-                            "opId",
-                            "entity",
-                            "op",
-                            "id",
-                            "data",
-                            "clientUpdatedAt"
-                          ]
+                          "required": ["opId", "entity", "op", "id", "data", "clientUpdatedAt"]
                         },
                         {
                           "type": "object",
@@ -9644,15 +8768,11 @@
                             },
                             "entity": {
                               "type": "string",
-                              "enum": [
-                                "transaction"
-                              ]
+                              "enum": ["transaction"]
                             },
                             "op": {
                               "type": "string",
-                              "enum": [
-                                "delete"
-                              ]
+                              "enum": ["delete"]
                             },
                             "id": {
                               "type": "string",
@@ -9663,21 +8783,13 @@
                               "type": "string"
                             }
                           },
-                          "required": [
-                            "opId",
-                            "entity",
-                            "op",
-                            "id",
-                            "clientUpdatedAt"
-                          ]
+                          "required": ["opId", "entity", "op", "id", "clientUpdatedAt"]
                         }
                       ]
                     }
                   }
                 },
-                "required": [
-                  "operations"
-                ]
+                "required": ["operations"]
               }
             }
           }
@@ -9702,12 +8814,7 @@
                           },
                           "status": {
                             "type": "string",
-                            "enum": [
-                              "applied",
-                              "duplicate",
-                              "conflict",
-                              "rejected"
-                            ]
+                            "enum": ["applied", "duplicate", "conflict", "rejected"]
                           },
                           "message": {
                             "type": "string"
@@ -9723,13 +8830,7 @@
                               },
                               "type": {
                                 "type": "string",
-                                "enum": [
-                                  "income",
-                                  "expense",
-                                  "transfer",
-                                  "refund",
-                                  "adjustment"
-                                ]
+                                "enum": ["income", "expense", "transfer", "refund", "adjustment"]
                               },
                               "amount": {
                                 "type": "integer",
@@ -9816,11 +8917,7 @@
                             "additionalProperties": false
                           }
                         },
-                        "required": [
-                          "opId",
-                          "status",
-                          "transaction"
-                        ],
+                        "required": ["opId", "status", "transaction"],
                         "additionalProperties": false
                       }
                     },
@@ -9828,10 +8925,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "results",
-                    "serverTime"
-                  ],
+                  "required": ["results", "serverTime"],
                   "additionalProperties": false
                 }
               }
@@ -9843,9 +8937,7 @@
     "/api/v1/sync/pull": {
       "get": {
         "summary": "Changes since a server timestamp (full snapshot when omitted)",
-        "tags": [
-          "sync"
-        ],
+        "tags": ["sync"],
         "parameters": [
           {
             "schema": {
@@ -9882,19 +8974,11 @@
                           },
                           "type": {
                             "type": "string",
-                            "enum": [
-                              "cash",
-                              "bank",
-                              "ewallet",
-                              "savings",
-                              "credit"
-                            ]
+                            "enum": ["cash", "bank", "ewallet", "savings", "credit"]
                           },
                           "currency": {
                             "type": "string",
-                            "enum": [
-                              "PHP"
-                            ]
+                            "enum": ["PHP"]
                           },
                           "openingBalance": {
                             "type": "integer",
@@ -9964,10 +9048,7 @@
                           },
                           "kind": {
                             "type": "string",
-                            "enum": [
-                              "income",
-                              "expense"
-                            ]
+                            "enum": ["income", "expense"]
                           },
                           "color": {
                             "nullable": true,
@@ -10012,13 +9093,7 @@
                           },
                           "type": {
                             "type": "string",
-                            "enum": [
-                              "income",
-                              "expense",
-                              "transfer",
-                              "refund",
-                              "adjustment"
-                            ]
+                            "enum": ["income", "expense", "transfer", "refund", "adjustment"]
                           },
                           "amount": {
                             "type": "integer",
@@ -10120,10 +9195,7 @@
                           },
                           "direction": {
                             "type": "string",
-                            "enum": [
-                              "inflow",
-                              "outflow"
-                            ]
+                            "enum": ["inflow", "outflow"]
                           },
                           "kind": {
                             "type": "string",
@@ -10139,21 +9211,11 @@
                           },
                           "status": {
                             "type": "string",
-                            "enum": [
-                              "planned",
-                              "committed",
-                              "recurring",
-                              "paid",
-                              "cancelled"
-                            ]
+                            "enum": ["planned", "committed", "recurring", "paid", "cancelled"]
                           },
                           "confidence": {
                             "type": "string",
-                            "enum": [
-                              "confirmed",
-                              "likely",
-                              "uncertain"
-                            ]
+                            "enum": ["confirmed", "likely", "uncertain"]
                           },
                           "accountId": {
                             "nullable": true,
@@ -10255,9 +9317,7 @@
                       "properties": {
                         "currency": {
                           "type": "string",
-                          "enum": [
-                            "PHP"
-                          ]
+                          "enum": ["PHP"]
                         },
                         "timezone": {
                           "type": "string"
@@ -10310,9 +9370,7 @@
     "/api/v1/demo": {
       "post": {
         "summary": "Load clearly flagged demo data",
-        "tags": [
-          "demo"
-        ],
+        "tags": ["demo"],
         "responses": {
           "200": {
             "description": "Default Response",
@@ -10325,9 +9383,7 @@
                       "type": "boolean"
                     }
                   },
-                  "required": [
-                    "demoMode"
-                  ],
+                  "required": ["demoMode"],
                   "additionalProperties": false
                 }
               }
@@ -10337,9 +9393,7 @@
       },
       "delete": {
         "summary": "Remove all demo data",
-        "tags": [
-          "demo"
-        ],
+        "tags": ["demo"],
         "responses": {
           "200": {
             "description": "Default Response",
@@ -10352,9 +9406,7 @@
                       "type": "boolean"
                     }
                   },
-                  "required": [
-                    "demoMode"
-                  ],
+                  "required": ["demoMode"],
                   "additionalProperties": false
                 }
               }

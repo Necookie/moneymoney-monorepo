@@ -14,8 +14,8 @@ name: moneymoney
 x-logging: &default-logging
   driver: json-file
   options:
-    max-size: "10m"
-    max-file: "3"
+    max-size: '10m'
+    max-file: '3'
 
 services:
   moneymoney-postgres:
@@ -39,7 +39,7 @@ services:
     networks:
       - moneymoney-db
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U moneymoney -d moneymoney"]
+      test: ['CMD-SHELL', 'pg_isready -U moneymoney -d moneymoney']
       interval: 10s
       timeout: 5s
       retries: 10
@@ -56,18 +56,18 @@ services:
     restart: unless-stopped
     environment:
       NODE_ENV: production
-      PORT: "3001"
+      PORT: '3001'
       LOG_LEVEL: info
       APP_VERSION: ${APP_VERSION:-main}
       DATABASE_URL: postgres://moneymoney:${POSTGRES_PASSWORD}@moneymoney-postgres:5432/moneymoney
-      DATABASE_POOL_MAX: "10"
+      DATABASE_POOL_MAX: '10'
       CLERK_SECRET_KEY: ${CLERK_SECRET_KEY:?CLERK_SECRET_KEY is required}
       CLERK_AUTHORIZED_PARTIES: ${CLERK_AUTHORIZED_PARTIES:-https://moneymoney.necookie.dev}
       OWNER_CLERK_USER_IDS: ${OWNER_CLERK_USER_IDS:?OWNER_CLERK_USER_IDS is required}
       CORS_ORIGINS: ${CORS_ORIGINS:-https://moneymoney.necookie.dev}
-      RATE_LIMIT_PER_MINUTE: "300"
-      ENABLE_API_DOCS: "true"
-      TRUST_PROXY: "true"
+      RATE_LIMIT_PER_MINUTE: '300'
+      ENABLE_API_DOCS: 'true'
+      TRUST_PROXY: 'true'
     depends_on:
       moneymoney-postgres:
         condition: service_healthy
@@ -75,7 +75,7 @@ services:
       - moneymoney-db
       - moneymoney-network
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3001/ready"]
+      test: ['CMD', 'wget', '-qO-', 'http://127.0.0.1:3001/ready']
       interval: 30s
       timeout: 5s
       retries: 3
@@ -87,7 +87,7 @@ services:
   moneymoney-tunnel:
     image: cloudflare/cloudflared:2026.10.7
     restart: unless-stopped
-    command: ["tunnel", "--no-autoupdate", "--metrics", "0.0.0.0:2000", "run"]
+    command: ['tunnel', '--no-autoupdate', '--metrics', '0.0.0.0:2000', 'run']
     environment:
       TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN:?CLOUDFLARE_TUNNEL_TOKEN is required}
     depends_on:
@@ -96,7 +96,7 @@ services:
     networks:
       - moneymoney-network
     healthcheck:
-      test: ["CMD", "cloudflared", "tunnel", "--metrics", "127.0.0.1:2000", "ready"]
+      test: ['CMD', 'cloudflared', 'tunnel', '--metrics', '127.0.0.1:2000', 'ready']
       interval: 30s
       timeout: 5s
       retries: 3
@@ -117,9 +117,9 @@ services:
       PGPASSWORD: ${POSTGRES_PASSWORD}
       PGDATABASE: moneymoney
       BACKUP_DIR: /backups
-      BACKUP_HOUR: "02"
-      BACKUP_RETENTION_DAYS: "14"
-      VERIFY_WEEKDAY: "7"
+      BACKUP_HOUR: '02'
+      BACKUP_RETENTION_DAYS: '14'
+      VERIFY_WEEKDAY: '7'
       RCLONE_CONFIG_B64: ${RCLONE_CONFIG_B64:-}
       RCLONE_REMOTE: ${RCLONE_REMOTE:-}
     depends_on:

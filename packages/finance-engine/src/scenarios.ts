@@ -2,7 +2,12 @@ import type { Centavos, IsoDate } from '@mm/types';
 import { addDays } from './dates.js';
 import { buildForecast, type ForecastInput, type ForecastResult } from './forecast.js';
 import { multiplyRatio } from './money.js';
-import { effectiveRule, scheduleDates, type EngineEvent, type OccurrenceOverride } from './recurrence.js';
+import {
+  effectiveRule,
+  scheduleDates,
+  type EngineEvent,
+  type OccurrenceOverride,
+} from './recurrence.js';
 
 export type Scenario =
   | { type: 'baseline'; label?: string }
