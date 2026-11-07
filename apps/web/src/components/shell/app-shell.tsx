@@ -1,5 +1,6 @@
 'use client';
 
+import { InstallAndroidDialog } from '@/features/android/install-android-dialog';
 import { SignOutButton, UserButton } from '@clerk/nextjs';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
@@ -222,18 +223,26 @@ function SidebarContents({
         </ul>
       </nav>
 
-      <div className={'px-3 pb-2'}>
-        <Link
-          href="/settings#android"
-          title={collapsed ? 'Install Android app' : undefined}
-          className={cn(
-            'flex h-10 items-center gap-3 rounded-button border border-canvas/15 text-[13px] text-canvas/75 transition-colors hover:border-canvas/30 hover:text-canvas',
-            collapsed ? 'justify-center' : 'px-3',
-          )}
-        >
-          <Icon name="phone" size={18} />
-          {collapsed ? <span className="sr-only">Install Android app</span> : 'Install Android app'}
-        </Link>
+      <div className="px-3 pb-2">
+        <InstallAndroidDialog
+          trigger={
+            <button
+              type="button"
+              title={collapsed ? 'Install Android app' : undefined}
+              className={cn(
+                'flex h-10 w-full cursor-pointer items-center gap-3 rounded-button border border-canvas/15 text-[13px] text-canvas/75 transition-colors hover:border-canvas/30 hover:text-canvas',
+                collapsed ? 'justify-center' : 'px-3',
+              )}
+            >
+              <Icon name="phone" size={18} />
+              {collapsed ? (
+                <span className="sr-only">Install Android app</span>
+              ) : (
+                'Install Android app'
+              )}
+            </button>
+          }
+        />
       </div>
 
       <div

@@ -10,7 +10,8 @@ import { Badge, Skeleton } from '@/components/ui/misc';
 import type { AndroidReleaseCatalog } from '@/lib/android-releases';
 import { QrCode } from './qr-code';
 
-const INSTALL_LINK = 'https://moneymoney.necookie.dev/download/android';
+/** Stable link to the newest APK — what every QR code encodes. */
+export const INSTALL_LINK = 'https://moneymoney.necookie.dev/download/android';
 
 function formatSize(bytes: number): string {
   return bytes >= 1_048_576
@@ -75,7 +76,7 @@ export function AndroidAppCard() {
         ) : (
           <div className="flex flex-col gap-5">
             <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
-              <div className="hidden shrink-0 flex-col items-center gap-2 sm:flex">
+              <div className="flex shrink-0 flex-col items-center gap-2">
                 <QrCode value={INSTALL_LINK} label="QR code to download the Android app" />
                 <span className="text-[12px] text-muted">Scan with your phone</span>
               </div>
