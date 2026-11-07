@@ -38,3 +38,5 @@ Thumbs.db
 .vscode/*
 !.vscode/extensions.json
 .next-e2e/
+apps/mobile/credentials.json
+.secrets/

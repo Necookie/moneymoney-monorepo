@@ -129,3 +129,38 @@ creates the GitHub Release. Requires `eas login` for EAS builds and `gh auth log
 Download an older APK from *Previous versions*. Android refuses to install a lower versionCode
 over a higher one, so uninstall first — sync any pending offline entries before uninstalling (the
 server holds everything else). Prefer shipping a new patch version that reverts the change.
+
+## Signing key (read this before the first release)
+
+All builds — local and EAS — are signed with **one** upload key so every version installs over the
+previous one:
+
+| Item | Location (never committed) |
+|---|---|
+| Keystore | `.secrets/android/moneymoney-release.jks` (PKCS12, RSA 4096, alias `moneymoney`) |
+| Password | `MM_ANDROID_KEYSTORE_PASSWORD` in `.secrets.local.env` |
+| EAS | `apps/mobile/credentials.json` + `"credentialsSource": "local"` in `eas.json` → EAS signs with the same key |
+
+**Back up the keystore and its password** (e.g. a password manager). If it is lost, installed
+copies can never be updated — you would have to uninstall and reinstall.
+
+## Building on this PC instead of EAS
+
+One-time: accept the Android SDK licenses yourself (the command-line tools are installed in
+`%LOCALAPPDATA%\Android\Sdk`):
+
+```bat
+"%LOCALAPPDATA%\Android\Sdk\cmdline-tools\latest\bin\sdkmanager.bat" --licenses
+```
+
+Then:
+
+```bash
+pnpm --filter @mm/mobile release:android -- --local                 # release the current version
+pnpm --filter @mm/mobile release:android -- --bump patch --local    # bump + build + publish
+```
+
+`--local` runs `expo prebuild` (the `with-release-signing` config plugin wires the upload key into
+Gradle via `ORG_GRADLE_PROJECT_*` environment variables — no secrets on disk in `android/`) and
+`gradlew assembleRelease` for **arm64-v8a** (all current Android phones). Gradle downloads the SDK
+platform, build tools, NDK and CMake it needs on the first run.
