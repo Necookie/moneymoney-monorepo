@@ -7,7 +7,9 @@ import { clerkMiddleware } from '@clerk/nextjs/server';
  * Defence in depth: the (app) layout re-checks the session on the server, and the API verifies
  * the bearer token and the owner allow-list on every request.
  */
-const PUBLIC_PREFIXES = ['/sign-in'];
+// Android release metadata and the stable APK download link are public (the APK is published on
+// GitHub Releases anyway, and the app itself is useless without the owner's sign-in).
+const PUBLIC_PREFIXES = ['/sign-in', '/api/android', '/download/android'];
 
 function isPublic(pathname: string): boolean {
   return PUBLIC_PREFIXES.some((p) => pathname === p || pathname.startsWith(`${p}/`));

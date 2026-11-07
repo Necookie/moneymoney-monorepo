@@ -58,7 +58,8 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint src test",
     "eas-build-post-install": "pnpm --filter \"@mm/mobile^...\" build",
-    "test": "vitest run"
+    "test": "vitest run",
+    "release:android": "node scripts/release-android.mjs"
   },
   "private": true
 }

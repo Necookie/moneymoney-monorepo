@@ -19,7 +19,7 @@
     },
     "android": {
       "package": "dev.necookie.moneymoney",
-      "versionCode": 1,
+      "versionCode": 10000,
       "adaptiveIcon": {
         "backgroundColor": "#0C0A08",
         "foregroundImage": "./assets/android-icon-foreground.png",

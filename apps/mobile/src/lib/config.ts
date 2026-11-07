@@ -5,6 +5,11 @@ export const config = {
     /\/+$/,
     '',
   ),
+  /** Web app origin — also serves the Android release catalogue used for update checks. */
+  webUrl: (process.env.EXPO_PUBLIC_WEB_URL || 'https://moneymoney.necookie.dev').replace(
+    /\/+$/,
+    '',
+  ),
   timeZone: 'Asia/Manila',
 } as const;
 

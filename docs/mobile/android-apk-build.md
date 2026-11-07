@@ -89,3 +89,43 @@ white notification icon. Regenerate with `node apps/mobile/scripts/generate-bran
 - **App lock** (Settings) uses `expo-local-authentication` with device-credential fallback; it
   re-locks after 60 s in the background and is unavailable on devices with no screen lock.
 - `android.allowBackup` is `false` so the financial database is not copied into cloud backups.
+
+## Releases & version control
+
+Every Android build that users install is a **GitHub Release** on this repository:
+
+| Item | Convention |
+|---|---|
+| Tag | `android-v<semver>` (e.g. `android-v1.2.0`), created on the exact commit that was built |
+| Asset | `moneymoney-<version>.apk` (one per release) |
+| `expo.version` (app.json) | The user-visible version (semver) |
+| `android.versionCode` | Derived: `major·10000 + minor·100 + patch` — always increases with the version, so Android accepts updates installed over the existing app (`eas.json` uses `appVersionSource: "local"`) |
+| Release notes | Your notes + versionCode + commit + `SHA-256: <hex>` of the APK |
+
+### Publish a new version
+
+```bash
+pnpm --filter @mm/mobile release:android -- --bump patch --notes "Faster sync"   # 1.0.0 → 1.0.1
+pnpm --filter @mm/mobile release:android -- --bump minor                         # → 1.1.0
+pnpm --filter @mm/mobile release:android -- --apk path/to/app.apk                # publish a locally built APK
+pnpm --filter @mm/mobile release:android -- --bump patch --dry-run              # preflight only
+```
+
+The script checks `gh` auth, a clean git tree and that the tag is free; bumps and commits
+`app.json`; builds with EAS (`preview` profile) unless `--apk` is given; computes the SHA-256; and
+creates the GitHub Release. Requires `eas login` for EAS builds and `gh auth login`.
+
+### Where it shows up
+
+- **Web:** Settings → *Android app* (sidebar: *Install Android app*) shows the latest version,
+  size, notes, checksum, a QR code and previous versions. `https://moneymoney.necookie.dev/download/android`
+  always redirects to the newest APK; `/api/android/releases` returns the catalogue as JSON
+  (both public, cached 5 min).
+- **App:** Home shows an "update available" banner and Settings → *App version* has
+  *Check for updates* / *Download*. Updates install over the existing app and keep sign-in and data.
+
+### Rolling back
+
+Download an older APK from *Previous versions*. Android refuses to install a lower versionCode
+over a higher one, so uninstall first — sync any pending offline entries before uninstalling (the
+server holds everything else). Prefer shipping a new patch version that reverts the change.

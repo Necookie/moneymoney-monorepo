@@ -2,6 +2,7 @@ import { useClerk } from '@clerk/expo';
 import { toDecimalString } from '@mm/finance-engine';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import * as Application from 'expo-application';
+import { openDownload, useAppUpdate } from '@/lib/updates';
 import * as BackgroundTask from 'expo-background-task';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
@@ -305,10 +306,51 @@ export default function SettingsScreen() {
         <Button label="Sign out" variant="danger" icon="log-out" onPress={confirmSignOut} />
       </Card>
 
+      <AppVersionCard />
+
       <Text className="pt-2 text-center text-xs text-muted">
         Money Money {Application.nativeApplicationVersion ?? ''} (
         {Application.nativeBuildVersion ?? 'dev'})
       </Text>
     </Screen>
+  );
+}
+
+function AppVersionCard() {
+  const { installed, latest, update, checking, error, recheck } = useAppUpdate();
+  return (
+    <>
+      <Label className="px-1 pt-2">App version</Label>
+      <Card className="gap-2">
+        <Text weight="semibold">Installed {installed ?? 'development build'}</Text>
+        <Text className="text-sm text-muted">
+          {update
+            ? `Version ${update.version} is available.`
+            : error
+              ? 'Could not check for updates (offline?).'
+              : latest
+                ? 'You have the latest version.'
+                : checking
+                  ? 'Checking for updates…'
+                  : 'No published Android release found.'}
+        </Text>
+        {update ? (
+          <Button
+            label={`Download ${update.version}`}
+            variant="primary"
+            icon="arrow-down-left"
+            onPress={() => openDownload(update)}
+          />
+        ) : (
+          <Button
+            label={checking ? 'Checking…' : 'Check for updates'}
+            variant="secondary"
+            icon="refresh"
+            disabled={checking}
+            onPress={() => void recheck()}
+          />
+        )}
+      </Card>
+    </>
   );
 }

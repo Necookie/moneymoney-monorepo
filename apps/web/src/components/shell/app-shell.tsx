@@ -222,6 +222,20 @@ function SidebarContents({
         </ul>
       </nav>
 
+      <div className={'px-3 pb-2'}>
+        <Link
+          href="/settings#android"
+          title={collapsed ? 'Install Android app' : undefined}
+          className={cn(
+            'flex h-10 items-center gap-3 rounded-button border border-canvas/15 text-[13px] text-canvas/75 transition-colors hover:border-canvas/30 hover:text-canvas',
+            collapsed ? 'justify-center' : 'px-3',
+          )}
+        >
+          <Icon name="phone" size={18} />
+          {collapsed ? <span className="sr-only">Install Android app</span> : 'Install Android app'}
+        </Link>
+      </div>
+
       <div
         className={cn(
           'flex items-center gap-3 border-t border-canvas/10 py-4',

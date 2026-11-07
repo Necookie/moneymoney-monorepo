@@ -36,6 +36,8 @@ const ICONS = {
   trash: 'tools-trash-2',
   edit: 'tools-pencil',
   download: 'arrows-arrow-down-to-line',
+  phone: 'gadgets-tablet',
+  package: 'money-package',
   upload: 'arrows-arrow-up-from-line',
   more: 'layouts-grip-horizontal',
   filter: 'tools-funnel',

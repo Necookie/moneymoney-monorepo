@@ -7,6 +7,7 @@ import { ConfidenceChip } from '@/components/finance';
 import { Icon } from '@/components/Icon';
 import { Screen } from '@/components/Screen';
 import { SyncIndicator } from '@/components/SyncIndicator';
+import { UpdateBanner } from '@/components/UpdateBanner';
 import {
   Banner,
   Button,
@@ -75,6 +76,7 @@ export default function HomeScreen() {
 
   return (
     <Screen title="Home" right={<SyncIndicator />} refreshing={refreshing} onRefresh={refresh}>
+      <UpdateBanner />
       {dashboard.data?.fromCache ? (
         <Banner
           tone="neutral"

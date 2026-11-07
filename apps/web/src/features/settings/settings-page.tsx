@@ -1,5 +1,6 @@
 'use client';
 
+import { AndroidAppCard } from '@/features/android/android-app-card';
 import { SignOutButton, UserButton } from '@clerk/nextjs';
 import type { Category, Settings } from '@mm/api-client';
 import type { CategoryKind } from '@mm/types';
@@ -62,6 +63,7 @@ export function SettingsPage() {
             <DataCard />
             <AccountCard email={me.data.email} />
           </div>
+          <AndroidAppCard />
           <CategoriesCard />
         </div>
       )}

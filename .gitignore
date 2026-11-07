@@ -9,8 +9,8 @@ build/
 .turbo/
 .wrangler/
 .expo/
-android/
-ios/
+apps/mobile/android/
+apps/mobile/ios/
 *.apk
 *.aab
 coverage/
