@@ -1,0 +1,32 @@
+{
+  "name": "@mm/finance-engine",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Deterministic, pure TypeScript financial forecasting engine for Money Money.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint src test",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@mm/types": "workspace:*"
+  },
+  "devDependencies": {
+    "@mm/config": "workspace:*",
+    "vitest": "^5.1.0"
+  }
+}
