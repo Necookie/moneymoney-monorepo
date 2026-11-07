@@ -3,7 +3,7 @@
     "name": "Money Money",
     "slug": "moneymoney",
     "scheme": "moneymoney",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -19,7 +19,7 @@
     },
     "android": {
       "package": "dev.necookie.moneymoney",
-      "versionCode": 10000,
+      "versionCode": 10001,
       "adaptiveIcon": {
         "backgroundColor": "#0C0A08",
         "foregroundImage": "./assets/android-icon-foreground.png",
@@ -70,7 +70,15 @@
           "backgroundColor": "#0C0A08"
         }
       ],
-      "./plugins/with-release-signing"
+      "./plugins/with-release-signing",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "extraProguardRules": "# WorkManager (expo-background-task) and other AndroidX libraries create their Room databases\n# by reflection (Class.getDeclaredConstructor()). R8 otherwise strips the no-arg constructor of\n# the generated *_Impl classes and the app crashes on launch in WorkManagerInitializer.\n-keep class * extends androidx.room.RoomDatabase { <init>(); }\n-keep class androidx.work.impl.WorkDatabase_Impl { *; }"
+          }
+        }
+      ]
     ],
     "extra": {
       "router": {
