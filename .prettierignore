@@ -1,0 +1,9 @@
+pnpm-lock.yaml
+**/dist
+**/.next
+**/.open-next
+**/.wrangler
+**/.expo
+**/drizzle/meta
+**/coverage
+**/*.md

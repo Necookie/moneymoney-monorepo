@@ -1,0 +1,6 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+# React Native/Expo and EAS Build are most reliable with a hoisted node_modules layout.
+nodeLinker: hoisted
+autoInstallPeers: true
