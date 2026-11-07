@@ -90,19 +90,26 @@ const env = {
     ? { RCLONE_CONFIG_B64: fresh.RCLONE_CONFIG_B64, RCLONE_REMOTE: fresh.RCLONE_REMOTE }
     : {}),
 };
-await api('PATCH', `/applications/${app.uuid}/envs/bulk`, {
-  data: Object.entries(env).map(([key, value]) => ({
+// Production and preview copies, both runtime-only: secrets must never become Docker build args
+// (Coolify's default), because build args are recorded in image history.
+const envRows = (isPreview) =>
+  Object.entries(env).map(([key, value]) => ({
     key,
     value,
-    is_preview: false,
+    is_preview: isPreview,
     is_literal: true,
-    // Runtime-only: never pass secrets as Docker build args (they would land in image history).
     is_buildtime: false,
     is_runtime: true,
-  })),
+  }));
+await api('PATCH', `/applications/${app.uuid}/envs/bulk`, {
+  data: [...envRows(false), ...envRows(true)],
 });
 log(`set ${Object.keys(env).length} environment variables (values not printed)`);
 
+if (process.argv.includes('--no-deploy')) {
+  log('skipping deployment (--no-deploy)');
+  process.exit(0);
+}
 const deploy = await api('POST', `/deploy?uuid=${app.uuid}&force=false`);
 log(`deployment queued: ${JSON.stringify(deploy.deployments?.map((d) => d.deployment_uuid))}`);
 writeSecret('COOLIFY_APP_UUID', app.uuid);
