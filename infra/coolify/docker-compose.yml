@@ -1,0 +1,146 @@
+# Money Money — isolated application stack for Coolify ("Docker Compose" build pack).
+#
+# Coolify settings: Base Directory = /infra/coolify, Docker Compose Location = /docker-compose.yml
+# Everything here belongs to Money Money only: its own Postgres instance, credentials, volumes,
+# networks, backups and Cloudflare Tunnel. Nothing is published on host ports and the shared
+# Coolify proxy is not used — public traffic arrives only through the dedicated tunnel.
+#
+# Required environment (set in Coolify → Environment Variables; never commit values):
+#   POSTGRES_PASSWORD, CLERK_SECRET_KEY, OWNER_CLERK_USER_IDS, CLOUDFLARE_TUNNEL_TOKEN
+# Optional: CLERK_AUTHORIZED_PARTIES, CORS_ORIGINS, RCLONE_CONFIG_B64, RCLONE_REMOTE, APP_VERSION
+
+name: moneymoney
+
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+services:
+  moneymoney-postgres:
+    image: postgres:17.11-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: moneymoney
+      POSTGRES_DB: moneymoney
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    command:
+      - postgres
+      - -c
+      - shared_buffers=128MB
+      - -c
+      - max_connections=40
+      - -c
+      - log_min_duration_statement=1000
+    volumes:
+      - moneymoney-db-data:/var/lib/postgresql/data
+    networks:
+      - moneymoney-db
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U moneymoney -d moneymoney"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    mem_limit: 1g
+    cpus: 1.0
+    logging: *default-logging
+
+  moneymoney-api:
+    build:
+      context: ../..
+      dockerfile: infra/docker/api.Dockerfile
+    image: moneymoney-api:latest
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: "3001"
+      LOG_LEVEL: info
+      APP_VERSION: ${APP_VERSION:-main}
+      DATABASE_URL: postgres://moneymoney:${POSTGRES_PASSWORD}@moneymoney-postgres:5432/moneymoney
+      DATABASE_POOL_MAX: "10"
+      CLERK_SECRET_KEY: ${CLERK_SECRET_KEY:?CLERK_SECRET_KEY is required}
+      CLERK_AUTHORIZED_PARTIES: ${CLERK_AUTHORIZED_PARTIES:-https://moneymoney.necookie.dev}
+      OWNER_CLERK_USER_IDS: ${OWNER_CLERK_USER_IDS:?OWNER_CLERK_USER_IDS is required}
+      CORS_ORIGINS: ${CORS_ORIGINS:-https://moneymoney.necookie.dev}
+      RATE_LIMIT_PER_MINUTE: "300"
+      ENABLE_API_DOCS: "true"
+      TRUST_PROXY: "true"
+    depends_on:
+      moneymoney-postgres:
+        condition: service_healthy
+    networks:
+      - moneymoney-db
+      - moneymoney-network
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3001/ready"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 40s
+    mem_limit: 768m
+    cpus: 1.0
+    logging: *default-logging
+
+  moneymoney-tunnel:
+    image: cloudflare/cloudflared:2026.10.7
+    restart: unless-stopped
+    command: ["tunnel", "--no-autoupdate", "--metrics", "0.0.0.0:2000", "run"]
+    environment:
+      TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN:?CLOUDFLARE_TUNNEL_TOKEN is required}
+    depends_on:
+      moneymoney-api:
+        condition: service_healthy
+    networks:
+      - moneymoney-network
+    healthcheck:
+      test: ["CMD", "cloudflared", "tunnel", "--metrics", "127.0.0.1:2000", "ready"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    mem_limit: 128m
+    cpus: 0.25
+    logging: *default-logging
+
+  moneymoney-backup:
+    build:
+      context: ../..
+      dockerfile: infra/docker/backup.Dockerfile
+    image: moneymoney-backup:latest
+    restart: unless-stopped
+    environment:
+      PGHOST: moneymoney-postgres
+      PGUSER: moneymoney
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+      PGDATABASE: moneymoney
+      BACKUP_DIR: /backups
+      BACKUP_HOUR: "02"
+      BACKUP_RETENTION_DAYS: "14"
+      VERIFY_WEEKDAY: "7"
+      RCLONE_CONFIG_B64: ${RCLONE_CONFIG_B64:-}
+      RCLONE_REMOTE: ${RCLONE_REMOTE:-}
+    depends_on:
+      moneymoney-postgres:
+        condition: service_healthy
+    volumes:
+      - moneymoney-backups:/backups
+    networks:
+      - moneymoney-db
+      - moneymoney-network
+    mem_limit: 256m
+    cpus: 0.5
+    logging: *default-logging
+
+networks:
+  # Database traffic only; no route to the internet.
+  moneymoney-db:
+    internal: true
+  # Egress for the API (Clerk JWKS), the tunnel and off-server backups.
+  moneymoney-network:
+
+volumes:
+  moneymoney-db-data:
+  moneymoney-backups:
