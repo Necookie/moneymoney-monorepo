@@ -9414,6 +9414,70 @@
           }
         }
       }
+    },
+    "/api/v1/system/backup-status": {
+      "get": {
+        "summary": "Latest database backup and restore-verification timestamps",
+        "tags": ["system"],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "configured": {
+                      "type": "boolean"
+                    },
+                    "lastBackupAt": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "lastRestoreVerifiedAt": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "latest": {
+                      "nullable": true,
+                      "type": "object",
+                      "properties": {
+                        "file": {
+                          "type": "string"
+                        },
+                        "sizeBytes": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        }
+                      },
+                      "required": ["file", "sizeBytes"],
+                      "additionalProperties": false
+                    },
+                    "count": {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    "healthy": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "configured",
+                    "lastBackupAt",
+                    "lastRestoreVerifiedAt",
+                    "latest",
+                    "count",
+                    "healthy"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "servers": [

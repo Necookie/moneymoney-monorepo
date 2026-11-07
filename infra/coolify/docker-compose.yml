@@ -68,9 +68,13 @@ services:
       RATE_LIMIT_PER_MINUTE: '300'
       ENABLE_API_DOCS: 'true'
       TRUST_PROXY: 'true'
+      BACKUP_STATUS_DIR: /backups
     depends_on:
       moneymoney-postgres:
         condition: service_healthy
+    volumes:
+      # Read-only: lets GET /api/v1/system/backup-status report the sidecar's results.
+      - moneymoney-backups:/backups:ro
     networks:
       - moneymoney-db
       - moneymoney-network

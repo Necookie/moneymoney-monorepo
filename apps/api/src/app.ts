@@ -26,6 +26,7 @@ import { healthRoutes } from './modules/health/routes.js';
 import { scheduledEventsRoutes } from './modules/scheduled-events/routes.js';
 import { settingsRoutes } from './modules/settings/routes.js';
 import { syncRoutes } from './modules/sync/routes.js';
+import { systemRoutes } from './modules/system/routes.js';
 import { transactionsRoutes } from './modules/transactions/routes.js';
 
 declare module 'fastify' {
@@ -136,6 +137,7 @@ export async function buildApp(options: AppOptions) {
       await api.register(dashboardRoutes);
       await api.register(syncRoutes);
       await api.register(demoRoutes);
+      await api.register(systemRoutes);
     },
     { prefix: '/api/v1' },
   );

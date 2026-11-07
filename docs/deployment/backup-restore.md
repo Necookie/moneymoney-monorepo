@@ -34,7 +34,10 @@ Owned entirely by the Money Money stack (`moneymoney-backup` sidecar, image
 
 ## Check status
 
-Coolify → Money Money → moneymoney-backup logs (`[backup]`, `[verify] restore verification PASSED`).
+- `GET https://api.moneymoney.necookie.dev/api/v1/system/backup-status` (authenticated) returns the
+  last successful backup, last passed restore verification, newest file and size, count and a
+  `healthy` flag. The API reads the backups volume **read-only**.
+- Coolify → Money Money → moneymoney-backup logs (`[backup]`, `[verify] restore verification PASSED`).
 
 ## Restore (destructive)
 
