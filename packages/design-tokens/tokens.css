@@ -1,0 +1,55 @@
+/* Money Money design tokens as CSS custom properties (mirrors src/index.ts). */
+:root {
+  --mm-canvas: #f4f2f0;
+  --mm-card: #ffffff;
+  --mm-ink: #0c0a08;
+  --mm-ink-soft: #2a2826;
+  --mm-surface-dark: #1a1919;
+  --mm-muted: #6d6c6b;
+  --mm-subtle: #9c9a98;
+  --mm-border: #e5e7eb;
+  --mm-border-strong: #d4d2cf;
+  --mm-hover: #edeae7;
+  --mm-accent: #e4f222;
+  --mm-accent-ink: #0c0a08;
+  --mm-accent-hover: #d6e40f;
+  --mm-positive: #1f7a4d;
+  --mm-positive-soft: #e6f2ea;
+  --mm-negative: #b42318;
+  --mm-negative-soft: #fbeae8;
+  --mm-warning: #a15c07;
+  --mm-warning-soft: #fdf1dc;
+  --mm-info: #1d4ed8;
+  --mm-info-soft: #e6ecfb;
+  --mm-projection: #6d6c6b;
+  --mm-projection-soft: rgba(109, 108, 107, 0.1);
+
+  --mm-radius-button: 6px;
+  --mm-radius-input: 10px;
+  --mm-radius-card: 14px;
+  --mm-radius-card-lg: 16px;
+}
+
+:root[data-theme='dark'] {
+  --mm-canvas: #0f0e0d;
+  --mm-card: #1a1919;
+  --mm-ink: #f4f2f0;
+  --mm-ink-soft: #d9d6d3;
+  --mm-surface-dark: #0c0a08;
+  --mm-muted: #a3a19f;
+  --mm-subtle: #7a7876;
+  --mm-border: #2b2a29;
+  --mm-border-strong: #3a3836;
+  --mm-hover: #242322;
+  --mm-accent-hover: #eef85a;
+  --mm-positive: #4ade80;
+  --mm-positive-soft: #13291c;
+  --mm-negative: #f87171;
+  --mm-negative-soft: #2d1513;
+  --mm-warning: #fbbf24;
+  --mm-warning-soft: #2b210d;
+  --mm-info: #93c5fd;
+  --mm-info-soft: #132036;
+  --mm-projection: #a3a19f;
+  --mm-projection-soft: rgba(163, 161, 159, 0.12);
+}
