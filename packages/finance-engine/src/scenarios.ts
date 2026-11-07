@@ -2,7 +2,7 @@ import type { Centavos, IsoDate } from '@mm/types';
 import { addDays } from './dates.js';
 import { buildForecast, type ForecastInput, type ForecastResult } from './forecast.js';
 import { multiplyRatio } from './money.js';
-import { scheduleDates, type EngineEvent, type OccurrenceOverride } from './recurrence.js';
+import { effectiveRule, scheduleDates, type EngineEvent, type OccurrenceOverride } from './recurrence.js';
 
 export type Scenario =
   | { type: 'baseline'; label?: string }
@@ -46,7 +46,7 @@ export function applyScenario(input: ForecastInput, scenario: Scenario): Forecas
       );
       const shifted: OccurrenceOverride[] = [];
       for (const event of targets) {
-        for (const [, original] of scheduleDates(event.startDate, event.recurrence, endDate)) {
+        for (const [, original] of scheduleDates(event.startDate, effectiveRule(event), endDate)) {
           if (original < input.asOf) continue;
           const existing = overrides.find(
             (o) => o.eventId === event.id && o.occurrenceDate === original,
@@ -128,7 +128,7 @@ export function applyScenario(input: ForecastInput, scenario: Scenario): Forecas
         };
       }
       // Recurring/installment: move the next upcoming occurrence only.
-      for (const [, original] of scheduleDates(target.startDate, target.recurrence, endDate)) {
+      for (const [, original] of scheduleDates(target.startDate, effectiveRule(target), endDate)) {
         if (original < input.asOf) continue;
         return {
           ...input,

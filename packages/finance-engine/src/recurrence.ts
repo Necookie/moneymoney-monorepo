@@ -174,7 +174,8 @@ export function* scheduleDates(
   }
 }
 
-function effectiveRule(event: EngineEvent): RecurrenceRule {
+/** The rule actually used for expansion (installment plans become a counted monthly series). */
+export function effectiveRule(event: EngineEvent): RecurrenceRule {
   const installments = event.installments && event.installments > 1 ? event.installments : null;
   if (!installments) return event.recurrence;
   return {
