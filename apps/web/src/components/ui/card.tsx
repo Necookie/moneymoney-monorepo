@@ -19,7 +19,9 @@ export function CardHeader({
   id?: string;
 }) {
   return (
-    <div className={cn('flex items-start justify-between gap-3 px-5 pt-5', className)}>
+    <div
+      className={cn('flex items-start justify-between gap-3 px-4 pt-4 sm:px-5 sm:pt-5', className)}
+    >
       <div className="min-w-0">
         <h2 id={id} className="section-label">
           {title}
@@ -34,5 +36,5 @@ export function CardHeader({
 }
 
 export function CardContent({ className, ...props }: ComponentProps<'div'>) {
-  return <div className={cn('px-5 pt-4 pb-5', className)} {...props} />;
+  return <div className={cn('px-4 pt-4 pb-4 sm:px-5 sm:pb-5', className)} {...props} />;
 }

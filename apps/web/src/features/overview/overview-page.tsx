@@ -135,7 +135,7 @@ export function OverviewPage() {
 
 function PositionCard({ d }: { d: Dashboard }) {
   return (
-    <section className="rounded-card-lg bg-surface-dark p-6 text-canvas">
+    <section className="rounded-card-lg bg-surface-dark p-5 text-canvas sm:p-6">
       <div className="flex items-center justify-between gap-3">
         <h2 className="section-label !text-canvas/55">Actual net balance</h2>
         <Badge tone="dark" className="bg-canvas/10 text-canvas/80">
@@ -168,7 +168,7 @@ function PositionStat({ label, value, owed }: { label: string; value: number; ow
       <dt className="text-[11px] font-semibold tracking-[0.08em] text-canvas/50 uppercase">
         {label}
       </dt>
-      <dd className="tabular mt-1 truncate text-[15px] font-medium sm:text-[17px]">
+      <dd className="tabular mt-1 text-[14px] leading-5 font-medium break-words sm:text-[17px] sm:leading-6">
         {formatMoney(owed ? Math.abs(value) : value)}
       </dd>
     </div>
