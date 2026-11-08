@@ -153,4 +153,3 @@ export const DEFAULT_APP_FEATURES: AppFeatures = {
   afford: true,
   accounts: true,
 };
-

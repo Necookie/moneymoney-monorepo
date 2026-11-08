@@ -3,7 +3,12 @@
 import { AndroidAppCard } from '@/features/android/android-app-card';
 import { SignOutButton, UserButton } from '@clerk/nextjs';
 import type { Category, Settings } from '@mm/api-client';
-import { DEFAULT_APP_FEATURES, type AppFeature, type AppFeatures, type CategoryKind } from '@mm/types';
+import {
+  DEFAULT_APP_FEATURES,
+  type AppFeature,
+  type AppFeatures,
+  type CategoryKind,
+} from '@mm/types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useState, type FormEvent } from 'react';
@@ -48,15 +53,18 @@ function isValidTimeZone(tz: string): boolean {
 const FEATURE_METADATA: Record<AppFeature, { title: string; description: string }> = {
   calendar: {
     title: 'Financial Calendar',
-    description: 'Track upcoming bills, salaries, and recurring expense schedules on a visual calendar.',
+    description:
+      'Track upcoming bills, salaries, and recurring expense schedules on a visual calendar.',
   },
   forecast: {
     title: 'Cash Flow Forecast',
-    description: 'Explore daily balance projections across 7d, 30d, 90d, and 12m, plus what-if scenarios.',
+    description:
+      'Explore daily balance projections across 7d, 30d, 90d, and 12m, plus what-if scenarios.',
   },
   afford: {
     title: 'Can I afford this?',
-    description: 'Simulate purchase impact without risking upcoming obligations or your safety buffer.',
+    description:
+      'Simulate purchase impact without risking upcoming obligations or your safety buffer.',
   },
   budgets: {
     title: 'Budgets',
@@ -88,7 +96,10 @@ export function SettingsPage() {
         </Card>
       ) : (
         <div className="grid gap-4 lg:grid-cols-2">
-          <FeaturesCard key={`features-${me.data.settings.updatedAt}`} settings={me.data.settings} />
+          <FeaturesCard
+            key={`features-${me.data.settings.updatedAt}`}
+            settings={me.data.settings}
+          />
           <PreferencesCard key={me.data.settings.updatedAt} settings={me.data.settings} />
           <div className="flex flex-col gap-4">
             <DemoCard demoMode={me.data.settings.demoMode} />
