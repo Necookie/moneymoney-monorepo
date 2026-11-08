@@ -392,77 +392,129 @@ function LookupAccountSelect({
   );
 }
 
+function RiskLabel({ r }: { r: ScenarioResponse['comparisons'][number]['result'] }) {
+  return r.firstShortfallDate ? (
+    <span className="text-negative">Below zero {formatDate(r.firstShortfallDate, false)}</span>
+  ) : r.firstBelowBufferDate ? (
+    <span className="text-warning">Below buffer {formatDate(r.firstBelowBufferDate, false)}</span>
+  ) : (
+    <span className="text-positive">Above buffer</span>
+  );
+}
+
 function ComparisonTable({ data, horizon }: { data: ScenarioResponse; horizon: number }) {
   return (
-    <div className="overflow-x-auto rounded-[12px] border">
-      <table className="w-full min-w-[720px] text-[13px]">
-        <caption className="sr-only">Scenario comparison over {horizon} days</caption>
-        <thead className="bg-canvas text-left">
-          <tr>
-            <th className="px-4 py-2.5 font-medium text-muted">Scenario</th>
-            <th className="px-4 py-2.5 text-right font-medium text-muted">Ending balance</th>
-            <th className="px-4 py-2.5 text-right font-medium text-muted">Δ ending</th>
-            <th className="px-4 py-2.5 text-right font-medium text-muted">Lowest</th>
-            <th className="px-4 py-2.5 text-right font-medium text-muted">Δ lowest</th>
-            <th className="px-4 py-2.5 font-medium text-muted">Risk</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y">
-          {data.comparisons.map((c, i) => {
-            const baseline = c.scenario.type === 'baseline';
-            const r = c.result;
-            return (
-              <tr key={`${c.label}-${i}`} className={cn(baseline && 'bg-hover/50 font-medium')}>
-                <td className="px-4 py-3">
-                  {c.label}
-                  {baseline ? (
-                    <Badge tone="dark" className="ml-2">
-                      Baseline
-                    </Badge>
-                  ) : null}
-                </td>
-                <td className="px-4 py-3 text-right">
-                  <Money value={r.endingBalance} tone="auto" />
-                </td>
-                <td className="px-4 py-3 text-right">
-                  {baseline ? (
-                    <span className="text-muted">—</span>
-                  ) : (
-                    <Delta value={c.delta.endingBalance} />
-                  )}
-                </td>
-                <td className="px-4 py-3 text-right">
-                  <Money value={r.lowest.balance} tone="auto" />
-                  <span className="block text-[11px] text-muted">
-                    {formatDate(r.lowest.date, false)}
-                  </span>
-                </td>
-                <td className="px-4 py-3 text-right">
-                  {baseline ? (
-                    <span className="text-muted">—</span>
-                  ) : (
-                    <Delta value={c.delta.lowestBalance} />
-                  )}
-                </td>
-                <td className="px-4 py-3">
-                  {r.firstShortfallDate ? (
-                    <span className="text-negative">
-                      Below zero {formatDate(r.firstShortfallDate, false)}
+    <>
+      {/* Phones: one card per scenario instead of a 720px-wide table. */}
+      <ul
+        className="flex flex-col gap-2 md:hidden"
+        aria-label={`Scenario comparison over ${horizon} days`}
+      >
+        {data.comparisons.map((c, i) => {
+          const baseline = c.scenario.type === 'baseline';
+          const r = c.result;
+          return (
+            <li
+              key={`${c.label}-${i}`}
+              className={cn('rounded-[12px] border p-3 text-[13px]', baseline && 'bg-hover/50')}
+            >
+              <div className="flex items-center justify-between gap-2">
+                <span className="min-w-0 truncate font-medium">{c.label}</span>
+                {baseline ? <Badge tone="dark">Baseline</Badge> : null}
+              </div>
+              <dl className="mt-2 grid grid-cols-2 gap-x-3 gap-y-2">
+                <div>
+                  <dt className="text-[11px] text-muted">Ending balance</dt>
+                  <dd>
+                    <Money value={r.endingBalance} tone="auto" />
+                    {baseline ? null : (
+                      <span className="block">
+                        <Delta value={c.delta.endingBalance} />
+                      </span>
+                    )}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-[11px] text-muted">
+                    Lowest · {formatDate(r.lowest.date, false)}
+                  </dt>
+                  <dd>
+                    <Money value={r.lowest.balance} tone="auto" />
+                    {baseline ? null : (
+                      <span className="block">
+                        <Delta value={c.delta.lowestBalance} />
+                      </span>
+                    )}
+                  </dd>
+                </div>
+              </dl>
+              <p className="mt-2 border-t pt-2">
+                <RiskLabel r={r} />
+              </p>
+            </li>
+          );
+        })}
+      </ul>
+      <div className="hidden overflow-x-auto rounded-[12px] border md:block">
+        <table className="w-full min-w-[720px] text-[13px]">
+          <caption className="sr-only">Scenario comparison over {horizon} days</caption>
+          <thead className="bg-canvas text-left">
+            <tr>
+              <th className="px-4 py-2.5 font-medium text-muted">Scenario</th>
+              <th className="px-4 py-2.5 text-right font-medium text-muted">Ending balance</th>
+              <th className="px-4 py-2.5 text-right font-medium text-muted">Δ ending</th>
+              <th className="px-4 py-2.5 text-right font-medium text-muted">Lowest</th>
+              <th className="px-4 py-2.5 text-right font-medium text-muted">Δ lowest</th>
+              <th className="px-4 py-2.5 font-medium text-muted">Risk</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y">
+            {data.comparisons.map((c, i) => {
+              const baseline = c.scenario.type === 'baseline';
+              const r = c.result;
+              return (
+                <tr key={`${c.label}-${i}`} className={cn(baseline && 'bg-hover/50 font-medium')}>
+                  <td className="px-4 py-3">
+                    {c.label}
+                    {baseline ? (
+                      <Badge tone="dark" className="ml-2">
+                        Baseline
+                      </Badge>
+                    ) : null}
+                  </td>
+                  <td className="px-4 py-3 text-right">
+                    <Money value={r.endingBalance} tone="auto" />
+                  </td>
+                  <td className="px-4 py-3 text-right">
+                    {baseline ? (
+                      <span className="text-muted">—</span>
+                    ) : (
+                      <Delta value={c.delta.endingBalance} />
+                    )}
+                  </td>
+                  <td className="px-4 py-3 text-right">
+                    <Money value={r.lowest.balance} tone="auto" />
+                    <span className="block text-[11px] text-muted">
+                      {formatDate(r.lowest.date, false)}
                     </span>
-                  ) : r.firstBelowBufferDate ? (
-                    <span className="text-warning">
-                      Below buffer {formatDate(r.firstBelowBufferDate, false)}
-                    </span>
-                  ) : (
-                    <span className="text-positive">Above buffer</span>
-                  )}
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
+                  </td>
+                  <td className="px-4 py-3 text-right">
+                    {baseline ? (
+                      <span className="text-muted">—</span>
+                    ) : (
+                      <Delta value={c.delta.lowestBalance} />
+                    )}
+                  </td>
+                  <td className="px-4 py-3">
+                    <RiskLabel r={r} />
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </>
   );
 }
 
