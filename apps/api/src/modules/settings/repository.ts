@@ -1,4 +1,5 @@
 import { categories, type Database, userSettings, users } from '@mm/database';
+import { DEFAULT_APP_FEATURES, type AppFeatures } from '@mm/types';
 import type { UpdateSettings } from '@mm/validation';
 import { eq } from 'drizzle-orm';
 import { DEFAULT_CATEGORIES } from '../categories/defaults.js';
@@ -48,10 +49,26 @@ export async function getSettings(db: Database, userId: string) {
 }
 
 export async function updateSettings(db: Database, userId: string, patch: UpdateSettings) {
-  await getSettings(db, userId);
+  const current = await getSettings(db, userId);
+  const nextFeatures = patch.features
+    ? {
+        ...DEFAULT_APP_FEATURES,
+        ...((current.features as Partial<AppFeatures> | null) ?? {}),
+        ...patch.features,
+      }
+    : undefined;
+
   const [row] = await db
     .update(userSettings)
-    .set({ ...patch, updatedAt: new Date() })
+    .set({
+      ...(patch.timezone !== undefined ? { timezone: patch.timezone } : {}),
+      ...(patch.safetyBuffer !== undefined ? { safetyBuffer: patch.safetyBuffer } : {}),
+      ...(patch.emergencyFundGoalId !== undefined
+        ? { emergencyFundGoalId: patch.emergencyFundGoalId }
+        : {}),
+      ...(nextFeatures !== undefined ? { features: nextFeatures } : {}),
+      updatedAt: new Date(),
+    })
     .where(eq(userSettings.userId, userId))
     .returning();
   if (!row) throw new Error('Settings missing');

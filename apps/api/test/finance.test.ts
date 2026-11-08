@@ -571,4 +571,30 @@ describe('demo mode', () => {
     // The owner's real data is untouched.
     expect((await t.owner.get('/accounts')).body).toHaveLength(3);
   });
+
+  it('updates and persists feature toggles in settings', async () => {
+    const initial = await t.owner.get('/settings');
+    expect(initial.status).toBe(200);
+    expect(initial.body.features.calendar).toBe(true);
+    expect(initial.body.features.budgets).toBe(true);
+
+    const patched = await t.owner.patch('/settings', {
+      features: { calendar: false, budgets: false },
+    });
+    expect(patched.status).toBe(200);
+    expect(patched.body.features.calendar).toBe(false);
+    expect(patched.body.features.budgets).toBe(false);
+    expect(patched.body.features.forecast).toBe(true);
+
+    const refetched = await t.owner.get('/settings');
+    expect(refetched.body.features.calendar).toBe(false);
+    expect(refetched.body.features.budgets).toBe(false);
+    expect(refetched.body.features.forecast).toBe(true);
+
+    const me = await t.owner.get('/me');
+    expect(me.body.settings.features.calendar).toBe(false);
+
+    // Reset back
+    await t.owner.patch('/settings', { features: { calendar: true, budgets: true } });
+  });
 });

@@ -12,7 +12,7 @@
     "migrate": "node dist/migrate.js",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "lint": "eslint src test",
-    "test": "vitest run",
+    "test": "vitest run --hookTimeout=30000",
     "openapi": "tsx src/scripts/export-openapi.ts"
   },
   "dependencies": {

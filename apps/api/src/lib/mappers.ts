@@ -16,6 +16,7 @@ import type {
   Occurrence,
   OccurrenceOverride,
 } from '@mm/finance-engine';
+import { DEFAULT_APP_FEATURES, type AppFeatures } from '@mm/types';
 import type {
   Account,
   Alert,
@@ -41,6 +42,10 @@ export function toSettingsDto(row: Row<typeof userSettings>): Settings {
     safetyBuffer: row.safetyBuffer,
     emergencyFundGoalId: row.emergencyFundGoalId,
     demoMode: row.demoMode,
+    features: {
+      ...DEFAULT_APP_FEATURES,
+      ...((row.features as Partial<AppFeatures> | null) ?? {}),
+    },
     updatedAt: iso(row.updatedAt),
   };
 }
