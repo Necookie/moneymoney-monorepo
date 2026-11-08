@@ -121,3 +121,36 @@ export const SYNC_ENTITIES = ['transaction'] as const;
 export type SyncEntity = (typeof SYNC_ENTITIES)[number];
 export const SYNC_OPS = ['create', 'update', 'delete'] as const;
 export type SyncOp = (typeof SYNC_OPS)[number];
+
+// ── Feature flags ────────────────────────────────────────────────────────
+export const APP_FEATURES = [
+  'calendar',
+  'forecast',
+  'budgets',
+  'goals',
+  'insights',
+  'afford',
+  'accounts',
+] as const;
+export type AppFeature = (typeof APP_FEATURES)[number];
+
+export interface AppFeatures {
+  calendar: boolean;
+  forecast: boolean;
+  budgets: boolean;
+  goals: boolean;
+  insights: boolean;
+  afford: boolean;
+  accounts: boolean;
+}
+
+export const DEFAULT_APP_FEATURES: AppFeatures = {
+  calendar: true,
+  forecast: true,
+  budgets: true,
+  goals: true,
+  insights: true,
+  afford: true,
+  accounts: true,
+};
+

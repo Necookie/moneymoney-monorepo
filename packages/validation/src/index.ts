@@ -6,6 +6,7 @@ import {
   CATEGORY_KINDS,
   CONFIDENCE_LEVELS,
   CURRENCIES,
+  DEFAULT_APP_FEATURES,
   EVENT_DIRECTIONS,
   EVENT_KINDS,
   EVENT_STATUSES,
@@ -76,12 +77,24 @@ export const errorResponse = z.object({
 export type ErrorResponse = z.infer<typeof errorResponse>;
 
 // ── Settings ─────────────────────────────────────────────────────────────
+export const appFeatures = z.object({
+  calendar: z.boolean().default(true),
+  forecast: z.boolean().default(true),
+  budgets: z.boolean().default(true),
+  goals: z.boolean().default(true),
+  insights: z.boolean().default(true),
+  afford: z.boolean().default(true),
+  accounts: z.boolean().default(true),
+});
+export type AppFeatures = z.infer<typeof appFeatures>;
+
 export const settings = z.object({
   currency,
   timezone: z.string(),
   safetyBuffer: nonNegativeCentavos,
   emergencyFundGoalId: uuid.nullable(),
   demoMode: z.boolean(),
+  features: appFeatures.default(DEFAULT_APP_FEATURES),
   updatedAt: timestamp,
 });
 export type Settings = z.infer<typeof settings>;
@@ -91,6 +104,7 @@ export const updateSettings = z
     timezone: z.string().min(1).max(64),
     safetyBuffer: nonNegativeCentavos,
     emergencyFundGoalId: uuid.nullable(),
+    features: appFeatures.partial(),
   })
   .partial();
 export type UpdateSettings = z.infer<typeof updateSettings>;
