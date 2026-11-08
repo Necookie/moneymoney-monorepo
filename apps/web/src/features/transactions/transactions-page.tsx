@@ -183,8 +183,8 @@ export function TransactionsPage() {
       />
 
       <Card className="p-4">
-        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-[minmax(0,1.6fr)_repeat(4,minmax(0,1fr))]">
-          <div className="relative">
+        <div className="grid grid-cols-2 gap-2 sm:gap-3 xl:grid-cols-[minmax(0,1.6fr)_repeat(4,minmax(0,1fr))]">
+          <div className="relative col-span-2 xl:col-span-1">
             <Icon
               name="search"
               size={16}
@@ -242,7 +242,7 @@ export function TransactionsPage() {
           />
         </div>
         {preset === 'custom' ? (
-          <div className="mt-3 grid max-w-md grid-cols-2 gap-3">
+          <div className="mt-3 grid grid-cols-2 gap-3 sm:max-w-md">
             <Field label="From" htmlFor="tx-from">
               <DateInput
                 id="tx-from"
@@ -322,7 +322,24 @@ export function TransactionsPage() {
         )
       ) : (
         <Card className={cn('overflow-hidden', list.isPlaceholderData && 'opacity-60')}>
-          <div className="overflow-x-auto">
+          {/* Phones: one tappable row per transaction (same layout as the Android Activity tab). */}
+          <ul className="divide-y md:hidden">
+            {items.map((t) => (
+              <TransactionListItem
+                key={t.id}
+                tx={t}
+                lookups={lookups}
+                onEdit={() => openEdit(t)}
+                onDelete={() => setDeleting(t)}
+              />
+            ))}
+          </ul>
+          {totals ? (
+            <div className="border-t bg-canvas/60 px-4 py-3 text-[13px] md:hidden">
+              <TotalsSummary totals={totals} />
+            </div>
+          ) : null}
+          <div className="hidden overflow-x-auto md:block">
             <table className="w-full min-w-[640px] text-[14px]">
               <thead className="sticky top-0 z-10 bg-card">
                 <tr className="border-b text-left">
@@ -358,41 +375,14 @@ export function TransactionsPage() {
                 <tfoot>
                   <tr className="border-t bg-canvas/60 text-[13px]">
                     <td colSpan={5} className="px-5 py-3">
-                      <div className="flex flex-wrap items-center justify-end gap-x-6 gap-y-1">
-                        <span className="text-muted">
-                          Totals for these filters (transfers excluded)
-                        </span>
-                        <span>
-                          <span className="text-muted">Income </span>
-                          <span className="tabular font-medium text-positive">
-                            {formatMoney(totals.income)}
-                          </span>
-                        </span>
-                        <span>
-                          <span className="text-muted">Spending </span>
-                          <span className="tabular font-medium">
-                            {formatMoney(totals.expenses - totals.refunds)}
-                          </span>
-                        </span>
-                        <span>
-                          <span className="text-muted">Net </span>
-                          <span
-                            className={cn(
-                              'tabular font-semibold',
-                              totals.net < 0 ? 'text-negative' : 'text-ink',
-                            )}
-                          >
-                            {formatMoney(totals.net, { signed: true })}
-                          </span>
-                        </span>
-                      </div>
+                      <TotalsSummary totals={totals} />
                     </td>
                   </tr>
                 </tfoot>
               ) : null}
             </table>
           </div>
-          <div className="flex items-center justify-between gap-3 border-t px-5 py-3 text-[13px] text-muted">
+          <div className="flex items-center justify-between gap-3 border-t px-4 py-3 text-[13px] text-muted sm:px-5">
             <span>
               Showing {items.length} transaction{items.length === 1 ? '' : 's'}
             </span>
@@ -434,6 +424,142 @@ export function TransactionsPage() {
   );
 }
 
+function TotalsSummary({
+  totals,
+}: {
+  totals: { income: number; expenses: number; refunds: number; net: number };
+}) {
+  return (
+    <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-1 md:justify-end">
+      <span className="w-full text-muted md:w-auto">
+        Totals for these filters (transfers excluded)
+      </span>
+      <span>
+        <span className="text-muted">Income </span>
+        <span className="tabular font-medium text-positive">{formatMoney(totals.income)}</span>
+      </span>
+      <span>
+        <span className="text-muted">Spending </span>
+        <span className="tabular font-medium">{formatMoney(totals.expenses - totals.refunds)}</span>
+      </span>
+      <span>
+        <span className="text-muted">Net </span>
+        <span
+          className={cn('tabular font-semibold', totals.net < 0 ? 'text-negative' : 'text-ink')}
+        >
+          {formatMoney(totals.net, { signed: true })}
+        </span>
+      </span>
+    </div>
+  );
+}
+
+function transactionTitle(tx: Transaction, lookups: ReturnType<typeof useLookups>): string {
+  return (
+    tx.description ||
+    (tx.type === 'transfer'
+      ? 'Transfer'
+      : tx.categoryId
+        ? lookups.categoryName(tx.categoryId)
+        : TRANSACTION_TYPE_LABEL[tx.type])
+  );
+}
+
+function TransactionActions({
+  title,
+  onEdit,
+  onDelete,
+}: {
+  title: string;
+  onEdit: () => void;
+  onDelete: () => void;
+}) {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="icon-sm" aria-label={`Actions for ${title}`}>
+          <Icon name="more" size={16} />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent>
+        <DropdownMenuItem onSelect={onEdit}>
+          <Icon name="edit" size={14} />
+          Edit
+        </DropdownMenuItem>
+        <DropdownMenuItem destructive onSelect={onDelete}>
+          <Icon name="trash" size={14} />
+          Delete
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
+/** Mobile list row: title + meta on the left, signed amount + date on the right. */
+function TransactionListItem({
+  tx,
+  lookups,
+  onEdit,
+  onDelete,
+}: {
+  tx: Transaction;
+  lookups: ReturnType<typeof useLookups>;
+  onEdit: () => void;
+  onDelete: () => void;
+}) {
+  const amount = signedDisplay(tx);
+  const title = transactionTitle(tx, lookups);
+  const account =
+    tx.type === 'transfer'
+      ? `${lookups.accountName(tx.accountId)} → ${lookups.accountName(tx.counterAccountId)}`
+      : lookups.accountName(tx.accountId);
+  const category =
+    tx.categoryId && tx.type !== 'transfer' ? ` · ${lookups.categoryName(tx.categoryId)}` : '';
+  return (
+    <li className="flex items-center gap-1 pr-2">
+      <button
+        type="button"
+        onClick={onEdit}
+        className="flex min-w-0 flex-1 cursor-pointer items-start gap-3 py-3 pl-4 text-left active:bg-canvas/60"
+      >
+        <span className="min-w-0 flex-1">
+          <span className="block truncate font-medium">{title}</span>
+          <span className="mt-0.5 block truncate text-[12px] text-muted">
+            {TRANSACTION_TYPE_LABEL[tx.type]}
+            {category} · {account}
+          </span>
+          {tx.scheduledEventId || tx.isDemo || tx.tags.length ? (
+            <span className="mt-1 flex flex-wrap gap-1">
+              {tx.scheduledEventId ? (
+                <Badge tone="outline" className="py-0">
+                  From calendar
+                </Badge>
+              ) : null}
+              {tx.isDemo ? (
+                <Badge tone="warning" className="py-0">
+                  Demo
+                </Badge>
+              ) : null}
+              {tx.tags.map((t) => (
+                <Badge key={t} tone="neutral" className="py-0">
+                  #{t}
+                </Badge>
+              ))}
+            </span>
+          ) : null}
+        </span>
+        <span className="shrink-0 text-right">
+          <span className={cn('tabular block font-semibold', amount.className)}>{amount.text}</span>
+          <span className="tabular mt-0.5 block text-[12px] text-muted">
+            {formatDate(tx.occurredOn)}
+          </span>
+        </span>
+      </button>
+      <TransactionActions title={title} onEdit={onEdit} onDelete={onDelete} />
+    </li>
+  );
+}
+
 function signedDisplay(t: Transaction): { text: string; className: string } {
   switch (t.type) {
     case 'income':
@@ -465,13 +591,7 @@ function TransactionRow({
   onDelete: () => void;
 }) {
   const amount = signedDisplay(tx);
-  const title =
-    tx.description ||
-    (tx.type === 'transfer'
-      ? 'Transfer'
-      : tx.categoryId
-        ? lookups.categoryName(tx.categoryId)
-        : TRANSACTION_TYPE_LABEL[tx.type]);
+  const title = transactionTitle(tx, lookups);
   return (
     <tr className="group hover:bg-canvas/50">
       <td className="tabular px-5 py-3 align-top whitespace-nowrap text-ink-soft">
@@ -530,23 +650,7 @@ function TransactionRow({
         {amount.text}
       </td>
       <td className="px-3 py-2 text-right align-top">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon-sm" aria-label={`Actions for ${title}`}>
-              <Icon name="more" size={16} />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuItem onSelect={onEdit}>
-              <Icon name="edit" size={14} />
-              Edit
-            </DropdownMenuItem>
-            <DropdownMenuItem destructive onSelect={onDelete}>
-              <Icon name="trash" size={14} />
-              Delete
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <TransactionActions title={title} onEdit={onEdit} onDelete={onDelete} />
       </td>
     </tr>
   );
