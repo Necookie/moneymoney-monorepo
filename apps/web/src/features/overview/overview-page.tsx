@@ -36,6 +36,7 @@ const HEALTH_TONE = {
 
 export function OverviewPage() {
   const dashboard = useDashboard();
+  const me = useMe();
   const { openCreate } = useTransactionDialog();
 
   if (dashboard.isPending) return <OverviewSkeleton />;
@@ -45,6 +46,15 @@ export function OverviewPage() {
   const d = dashboard.data;
   if (d.isEmpty) return <FirstRun />;
 
+  const features = me.data?.settings.features;
+  const showCalendar = features?.calendar !== false;
+  const showForecast = features?.forecast !== false;
+  const showBudgets = features?.budgets !== false;
+  const showGoals = features?.goals !== false;
+  const showInsights = features?.insights !== false;
+
+  const showSideCol = showInsights || showGoals;
+
   return (
     <div className="flex flex-col gap-6">
       <PageHeader
@@ -52,12 +62,14 @@ export function OverviewPage() {
         description={`Your actual position and what's coming, as of ${formatDate(d.asOf)}.`}
         actions={
           <>
-            <Button variant="outline" asChild>
-              <Link href="/calendar?new=1">
-                <Icon name="calendar" size={16} />
-                Plan an item
-              </Link>
-            </Button>
+            {showCalendar ? (
+              <Button variant="outline" asChild>
+                <Link href="/calendar?new=1">
+                  <Icon name="calendar" size={16} />
+                  Plan an item
+                </Link>
+              </Button>
+            ) : null}
             <Button variant="primary" onClick={() => openCreate()} className="lg:hidden">
               <Icon name="plus" size={16} />
               Add transaction
@@ -90,45 +102,57 @@ export function OverviewPage() {
             </div>
           </CardContent>
         </Card>
-        <BudgetCard d={d} />
-        <Card>
-          <CardContent className="pt-5">
-            {d.projectedMonthEnd !== null ? (
-              <Figure
-                label="Projected month-end"
-                value={d.projectedMonthEnd}
-                size="md"
-                hint="Projection — scheduled items and remaining budgets"
-              />
-            ) : (
-              <div>
-                <div className="section-label">Projected month-end</div>
-                <p className="mt-2 text-sm text-muted">Not available yet.</p>
+        {showBudgets ? <BudgetCard d={d} /> : null}
+        {showForecast ? (
+          <Card>
+            <CardContent className="pt-5">
+              {d.projectedMonthEnd !== null ? (
+                <Figure
+                  label="Projected month-end"
+                  value={d.projectedMonthEnd}
+                  size="md"
+                  hint="Projection — scheduled items and remaining budgets"
+                />
+              ) : (
+                <div>
+                  <div className="section-label">Projected month-end</div>
+                  <p className="mt-2 text-sm text-muted">Not available yet.</p>
+                </div>
+              )}
+              <div className="mt-3 border-t pt-3">
+                <Figure
+                  label="Lowest in next 30 days"
+                  value={d.lowest30.balance}
+                  size="md"
+                  hint={`Projected on ${formatDate(d.lowest30.date)}`}
+                />
               </div>
-            )}
-            <div className="mt-3 border-t pt-3">
-              <Figure
-                label="Lowest in next 30 days"
-                value={d.lowest30.balance}
-                size="md"
-                hint={`Projected on ${formatDate(d.lowest30.date)}`}
-              />
+            </CardContent>
+          </Card>
+        ) : null}
+        {showCalendar ? <NextIncomeCard d={d} /> : null}
+      </div>
+
+      {showForecast ? <CashFlowCard safetyBuffer={d.safetyBuffer} /> : null}
+
+      {showCalendar || showSideCol ? (
+        <div className={cn('grid gap-4', showCalendar && showSideCol ? 'lg:grid-cols-3' : '')}>
+          {showCalendar ? (
+            <UpcomingCard d={d} className={showSideCol ? 'lg:col-span-2' : ''} />
+          ) : null}
+          {showSideCol ? (
+            <div className="flex flex-col gap-4">
+              {showInsights ? (
+                <>
+                  <HealthCard d={d} />
+                  <AlertsSummary d={d} />
+                </>
+              ) : null}
+              {showGoals ? <SavingsCard d={d} /> : null}
             </div>
-          </CardContent>
-        </Card>
-        <NextIncomeCard d={d} />
-      </div>
-
-      <CashFlowCard safetyBuffer={d.safetyBuffer} />
-
-      <div className="grid gap-4 lg:grid-cols-3">
-        <UpcomingCard d={d} className="lg:col-span-2" />
-        <div className="flex flex-col gap-4">
-          <HealthCard d={d} />
-          <AlertsSummary d={d} />
-          <SavingsCard d={d} />
+          ) : null}
         </div>
-      </div>
+      ) : null}
     </div>
   );
 }

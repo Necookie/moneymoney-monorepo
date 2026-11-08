@@ -36,9 +36,11 @@ import {
   shiftMonth,
   WEEKDAY_SHORT,
 } from '@/lib/format';
+import { FeatureDisabledState } from '@/components/feature-disabled-state';
 import {
   invalidatePlanning,
   useLookups,
+  useMe,
   useOccurrences,
   usePlannerEvents,
   useToday,
@@ -56,6 +58,7 @@ type EditorState =
   | null;
 
 export function CalendarPage() {
+  const me = useMe();
   const today = useToday();
   const params = useSearchParams();
   const router = useRouter();
@@ -69,6 +72,15 @@ export function CalendarPage() {
     return null;
   });
   const [selected, setSelected] = useState<OccurrenceDto | null>(null);
+
+  if (me.data?.settings.features.calendar === false) {
+    return (
+      <FeatureDisabledState
+        featureName="Financial Calendar"
+        description="Enable Financial Calendar in Settings to plan upcoming bills, salaries, and recurring schedules."
+      />
+    );
+  }
 
   const { from, to } = monthRange(month);
   const occurrences = useOccurrences(from, to);

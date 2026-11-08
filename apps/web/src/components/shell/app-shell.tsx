@@ -150,7 +150,10 @@ function MobileTabBar({
   onMoreOpenChange: (open: boolean) => void;
   onAdd: () => void;
 }) {
-  const onTab = MOBILE_TABS.some((t) => isActive(pathname, t.href));
+  const me = useMe();
+  const features = me.data?.settings.features;
+  const tabs = MOBILE_TABS.filter((t) => !t.feature || features?.[t.feature] !== false);
+  const onTab = tabs.some((t) => isActive(pathname, t.href));
   const tab = (item: (typeof MOBILE_TABS)[number]) => {
     const active = isActive(pathname, item.href);
     return (
@@ -178,7 +181,7 @@ function MobileTabBar({
       className="fixed inset-x-0 bottom-0 z-40 border-t bg-card/95 pb-[env(safe-area-inset-bottom)] backdrop-blur lg:hidden"
     >
       <div className="mx-auto flex h-16 max-w-xl items-center px-2">
-        {MOBILE_TABS.slice(0, 2).map(tab)}
+        {tabs.slice(0, 2).map(tab)}
         <div className="flex flex-1 justify-center">
           <button
             type="button"
@@ -189,7 +192,7 @@ function MobileTabBar({
             <Icon name="plus" size={26} />
           </button>
         </div>
-        {MOBILE_TABS.slice(2).map(tab)}
+        {tabs.slice(2).map(tab)}
         <Dialog open={moreOpen} onOpenChange={onMoreOpenChange}>
           <DialogTrigger asChild>
             <button
@@ -226,6 +229,9 @@ function SidebarContents({
 }) {
   const pathname = usePathname();
   const { openCreate } = useTransactionDialog();
+  const me = useMe();
+  const features = me.data?.settings.features;
+  const items = NAV_ITEMS.filter((item) => !item.feature || features?.[item.feature] !== false);
   return (
     <div className="flex h-full flex-col">
       <div className={cn('flex h-16 items-center', collapsed ? 'justify-center' : 'px-5')}>
@@ -263,7 +269,7 @@ function SidebarContents({
       <nav className="flex-1 overflow-y-auto px-3 py-2">
         {collapsed ? null : <p className="section-label px-2 pb-2 !text-canvas/45">Workspace</p>}
         <ul className="flex flex-col gap-0.5">
-          {NAV_ITEMS.map((item) => {
+          {items.map((item) => {
             const active = isActive(pathname, item.href);
             return (
               <li key={item.href}>

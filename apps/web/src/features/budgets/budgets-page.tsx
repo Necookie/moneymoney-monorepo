@@ -36,7 +36,8 @@ import {
   shiftMonth,
   type BudgetState,
 } from '@/lib/format';
-import { invalidateKeys, qk, useBudgets, useCategories, useToday } from '@/lib/queries';
+import { FeatureDisabledState } from '@/components/feature-disabled-state';
+import { invalidateKeys, qk, useBudgets, useCategories, useMe, useToday } from '@/lib/queries';
 import { cn } from '@/lib/utils';
 
 const STATE_TONE: Record<BudgetState, BadgeTone> = {
@@ -55,6 +56,7 @@ const BAR_TONE: Record<BudgetState, BarTone> = {
 const BUDGET_KEYS = [qk.budgets, qk.dashboard, qk.forecast, qk.alerts];
 
 export function BudgetsPage() {
+  const me = useMe();
   const today = useToday();
   const currentMonth = today.slice(0, 7);
   const [month, setMonth] = useState(currentMonth);
@@ -63,6 +65,15 @@ export function BudgetsPage() {
   const api = useApi();
   const qc = useQueryClient();
   const [editing, setEditing] = useState<Budget | 'new' | null>(null);
+
+  if (me.data?.settings.features.budgets === false) {
+    return (
+      <FeatureDisabledState
+        featureName="Budgets"
+        description="Enable Budgets in Settings to set monthly limits and monitor spending pace."
+      />
+    );
+  }
   const [deleting, setDeleting] = useState<Budget | null>(null);
 
   const remove = useMutation({

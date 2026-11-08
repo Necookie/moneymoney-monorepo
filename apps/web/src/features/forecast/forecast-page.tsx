@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { CashFlowChart } from '@/components/charts/cash-flow-chart';
 import { Icon } from '@/components/icons/icon';
 import { Figure, Money } from '@/components/money';
+import { FeatureDisabledState } from '@/components/feature-disabled-state';
 import { ErrorState, PageHeader } from '@/components/states';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge, Segmented, Skeleton, Switch } from '@/components/ui/misc';
@@ -45,6 +46,15 @@ export function ForecastPage() {
     includeBudgetedSpending: includeBudgets,
   });
   const safetyBuffer = forecast?.safetyBuffer ?? me.data?.settings.safetyBuffer ?? 0;
+
+  if (me.data?.settings.features.forecast === false) {
+    return (
+      <FeatureDisabledState
+        featureName="Forecast"
+        description="Enable Cash Flow Forecast in Settings to explore daily projections and scenarios."
+      />
+    );
+  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -116,7 +126,7 @@ export function ForecastPage() {
         </div>
       )}
 
-      <AffordabilityCard />
+      {me.data?.settings.features.afford !== false ? <AffordabilityCard /> : null}
       <ScenarioCard horizonDays={horizonDays} mode={mode} />
     </div>
   );

@@ -3,7 +3,7 @@
 import { AndroidAppCard } from '@/features/android/android-app-card';
 import { SignOutButton, UserButton } from '@clerk/nextjs';
 import type { Category, Settings } from '@mm/api-client';
-import type { CategoryKind } from '@mm/types';
+import { DEFAULT_APP_FEATURES, type AppFeature, type AppFeatures, type CategoryKind } from '@mm/types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useState, type FormEvent } from 'react';
@@ -16,7 +16,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { ConfirmDialog } from '@/components/ui/dialog';
 import { Field } from '@/components/ui/field';
 import { Input, NativeSelect } from '@/components/ui/input';
-import { Badge, Segmented } from '@/components/ui/misc';
+import { Badge, Segmented, Switch } from '@/components/ui/misc';
 import { useApi } from '@/lib/api';
 import { moneyToInput, readMoney } from '@/lib/format';
 import { invalidateKeys, qk, useCategories, useGoals, useMe } from '@/lib/queries';
@@ -45,18 +45,50 @@ function isValidTimeZone(tz: string): boolean {
   }
 }
 
+const FEATURE_METADATA: Record<AppFeature, { title: string; description: string }> = {
+  calendar: {
+    title: 'Financial Calendar',
+    description: 'Track upcoming bills, salaries, and recurring expense schedules on a visual calendar.',
+  },
+  forecast: {
+    title: 'Cash Flow Forecast',
+    description: 'Explore daily balance projections across 7d, 30d, 90d, and 12m, plus what-if scenarios.',
+  },
+  afford: {
+    title: 'Can I afford this?',
+    description: 'Simulate purchase impact without risking upcoming obligations or your safety buffer.',
+  },
+  budgets: {
+    title: 'Budgets',
+    description: 'Set monthly limits by category or overall, and monitor daily spending allowance.',
+  },
+  goals: {
+    title: 'Goals',
+    description: 'Track progress toward savings targets and safeguard your emergency reserve.',
+  },
+  accounts: {
+    title: 'Accounts',
+    description: 'Dedicated screen for cash, bank, e-wallet, savings, and credit liabilities.',
+  },
+  insights: {
+    title: 'Insights',
+    description: 'Proactive alerts for spending pace, upcoming shortfalls, and safety buffer dips.',
+  },
+};
+
 export function SettingsPage() {
   const me = useMe();
   if (me.isError) return <ErrorState error={me.error} onRetry={() => void me.refetch()} />;
   return (
     <div className="flex flex-col gap-6">
-      <PageHeader title="Settings" description="Forecast safety, data and your account." />
+      <PageHeader title="Settings" description="Features, safety buffer, data and your account." />
       {me.isPending ? (
         <Card className="p-5">
           <SkeletonRows rows={4} />
         </Card>
       ) : (
         <div className="grid gap-4 lg:grid-cols-2">
+          <FeaturesCard key={`features-${me.data.settings.updatedAt}`} settings={me.data.settings} />
           <PreferencesCard key={me.data.settings.updatedAt} settings={me.data.settings} />
           <div className="flex flex-col gap-4">
             <DemoCard demoMode={me.data.settings.demoMode} />
@@ -68,6 +100,80 @@ export function SettingsPage() {
         </div>
       )}
     </div>
+  );
+}
+
+function FeaturesCard({ settings }: { settings: Settings }) {
+  const api = useApi();
+  const qc = useQueryClient();
+  const [features, setFeatures] = useState<AppFeatures>({
+    ...DEFAULT_APP_FEATURES,
+    ...(settings.features ?? {}),
+  });
+
+  const save = useMutation({
+    mutationFn: (next: Partial<AppFeatures>) => api.settings.update({ features: next }),
+    onSuccess: () => {
+      toast.success('Feature settings saved');
+    },
+    onError: () => {
+      toast.error('Failed to update feature settings');
+      setFeatures({
+        ...DEFAULT_APP_FEATURES,
+        ...(settings.features ?? {}),
+      });
+    },
+    onSettled: () => invalidateKeys(qc, [qk.me, qk.dashboard]),
+  });
+
+  const onToggle = (feature: AppFeature, enabled: boolean) => {
+    const next = { ...features, [feature]: enabled };
+    setFeatures(next);
+    save.mutate({ [feature]: enabled });
+  };
+
+  const featureKeys: AppFeature[] = [
+    'calendar',
+    'forecast',
+    'afford',
+    'budgets',
+    'goals',
+    'accounts',
+    'insights',
+  ];
+
+  return (
+    <Card>
+      <CardHeader
+        title="Features"
+        description="Choose which features are active. Toggled-off features are hidden from navigation and dashboards."
+      />
+      <CardContent>
+        <div className="divide-y divide-border">
+          {featureKeys.map((key) => {
+            const meta = FEATURE_METADATA[key];
+            const enabled = features[key];
+            return (
+              <div
+                key={key}
+                className="flex items-center justify-between gap-4 py-3.5 first:pt-0 last:pb-0"
+              >
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-[14px] font-medium text-ink">{meta.title}</span>
+                  <span className="text-[12px] text-muted">{meta.description}</span>
+                </div>
+                <Switch
+                  checked={enabled}
+                  onCheckedChange={(checked) => onToggle(key, checked)}
+                  disabled={save.isPending}
+                  aria-label={`Toggle ${meta.title}`}
+                />
+              </div>
+            );
+          })}
+        </div>
+      </CardContent>
+    </Card>
   );
 }
 

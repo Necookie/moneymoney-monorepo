@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import { AccountSelect, DateInput, MoneyInput } from '@/components/form-controls';
 import { Icon } from '@/components/icons/icon';
 import { Money } from '@/components/money';
+import { FeatureDisabledState } from '@/components/feature-disabled-state';
 import { EmptyState, ErrorState, PageHeader, SkeletonRows } from '@/components/states';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -67,6 +68,15 @@ export function GoalsPage() {
   );
   const [history, setHistory] = useState<Goal | null>(null);
   const [deleting, setDeleting] = useState<Goal | null>(null);
+
+  if (me.data?.settings.features.goals === false) {
+    return (
+      <FeatureDisabledState
+        featureName="Goals"
+        description="Enable Goals in Settings to set savings targets and track emergency reserves."
+      />
+    );
+  }
 
   const archive = useMutation({
     mutationFn: (g: Goal) => api.goals.update(g.id, { archived: !g.archived }),

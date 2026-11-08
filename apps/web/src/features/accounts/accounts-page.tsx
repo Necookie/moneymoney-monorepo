@@ -34,7 +34,8 @@ import { Input, NativeSelect } from '@/components/ui/input';
 import { Badge, Skeleton, Switch } from '@/components/ui/misc';
 import { errorMessage, isApiError, useApi } from '@/lib/api';
 import { ACCOUNT_TYPE_LABEL, moneyToInput, readMoney } from '@/lib/format';
-import { invalidateFinancial, useAccounts, useToday } from '@/lib/queries';
+import { FeatureDisabledState } from '@/components/feature-disabled-state';
+import { invalidateFinancial, useAccounts, useMe, useToday } from '@/lib/queries';
 import { cn } from '@/lib/utils';
 
 const TYPE_ICON: Record<AccountType, IconName> = {
@@ -46,6 +47,7 @@ const TYPE_ICON: Record<AccountType, IconName> = {
 };
 
 export function AccountsPage() {
+  const me = useMe();
   const accounts = useAccounts();
   const params = useSearchParams();
   const router = useRouter();
@@ -56,6 +58,15 @@ export function AccountsPage() {
   const [deleting, setDeleting] = useState<Account | null>(null);
   const api = useApi();
   const qc = useQueryClient();
+
+  if (me.data?.settings.features.accounts === false) {
+    return (
+      <FeatureDisabledState
+        featureName="Accounts"
+        description="Enable Accounts in Settings to manage cash, bank, e-wallet, savings, and credit accounts."
+      />
+    );
+  }
 
   const closeEditor = () => {
     setEditing(null);

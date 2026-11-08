@@ -18,6 +18,7 @@ import {
 import { toast } from 'sonner';
 import { Icon, type IconName } from '@/components/icons/icon';
 import { Money } from '@/components/money';
+import { FeatureDisabledState } from '@/components/feature-disabled-state';
 import { EmptyState, ErrorState, PageHeader, SkeletonRows } from '@/components/states';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -32,6 +33,7 @@ import {
   useDashboard,
   useForecast,
   useLookups,
+  useMe,
 } from '@/lib/queries';
 import { cn } from '@/lib/utils';
 
@@ -50,7 +52,17 @@ const SEVERITY_ORDER: Record<AlertSeverity, number> = { critical: 0, warning: 1,
 type AlertView = 'active' | 'dismissed' | 'resolved';
 
 export function InsightsPage() {
+  const me = useMe();
   const dashboard = useDashboard();
+
+  if (me.data?.settings.features.insights === false) {
+    return (
+      <FeatureDisabledState
+        featureName="Insights"
+        description="Enable Insights in Settings to view automated spending pace alerts and financial health analysis."
+      />
+    );
+  }
   return (
     <div className="flex flex-col gap-6">
       <PageHeader
