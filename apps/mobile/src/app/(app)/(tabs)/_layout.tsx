@@ -7,10 +7,11 @@ import { Icon, type IconName } from '@/components/Icon';
 import { Text } from '@/components/ui';
 import { colors } from '@/lib/theme';
 
+/** Same names, order and centre "add" action as the web app's phone tab bar. */
 const TABS: Record<string, { label: string; icon: IconName }> = {
-  index: { label: 'Home', icon: 'house' },
-  activity: { label: 'Activity', icon: 'receipt' },
-  plan: { label: 'Plan', icon: 'calendar' },
+  index: { label: 'Overview', icon: 'house' },
+  activity: { label: 'Transactions', icon: 'receipt' },
+  plan: { label: 'Calendar', icon: 'calendar' },
   more: { label: 'More', icon: 'menu' },
 };
 
@@ -44,7 +45,7 @@ function TabBar({ state, emitter, navigateToTab }: BottomTabBarProps) {
             navigateToTab(route.key);
           }
         }}
-        className="flex-1 items-center justify-center gap-1"
+        className="flex-1 items-center justify-center gap-1 px-0.5"
         style={{ minHeight: 56 }}
       >
         <View className="items-center">
@@ -61,6 +62,9 @@ function TabBar({ state, emitter, navigateToTab }: BottomTabBarProps) {
         </View>
         <Text
           weight={focused ? 'semibold' : 'regular'}
+          numberOfLines={1}
+          adjustsFontSizeToFit
+          minimumFontScale={0.85}
           className={`text-xs ${focused ? 'text-ink' : 'text-muted'}`}
         >
           {meta.label}

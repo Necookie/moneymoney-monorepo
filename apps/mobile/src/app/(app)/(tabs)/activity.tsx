@@ -74,7 +74,7 @@ export default function ActivityScreen() {
       <DemoBanner />
       <Row className="justify-between px-4 pb-2 pt-2">
         <Text weight="semibold" className="text-2xl">
-          Activity
+          Transactions
         </Text>
         <SyncIndicator />
       </Row>

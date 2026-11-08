@@ -346,7 +346,7 @@ export default function PlanScreen() {
 
   return (
     <Screen
-      title="Plan"
+      title="Financial calendar"
       right={<SyncIndicator />}
       refreshing={refreshing}
       onRefresh={async () => {

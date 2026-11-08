@@ -5,10 +5,28 @@ import { Screen } from '@/components/Screen';
 import { SyncIndicator } from '@/components/SyncIndicator';
 import { Card, Divider, Label, ListRow, Text } from '@/components/ui';
 
+/** Mirrors the web sidebar order: Forecast, Budgets, Goals, Accounts, Insights, Settings. */
 const SECTIONS: {
   title: string;
   items: { href: Href; title: string; subtitle: string; icon: IconName }[];
 }[] = [
+  {
+    title: 'Look ahead',
+    items: [
+      {
+        href: '/forecast',
+        title: 'Forecast',
+        subtitle: 'Projected balance and what-if scenarios',
+        icon: 'chart-line',
+      },
+      {
+        href: '/afford',
+        title: 'Can I afford this?',
+        subtitle: 'Check a purchase against your obligations',
+        icon: 'shield-check',
+      },
+    ],
+  },
   {
     title: 'Money',
     items: [
@@ -25,26 +43,9 @@ const SECTIONS: {
         subtitle: 'Balances, including unsynced changes',
         icon: 'wallet',
       },
-    ],
-  },
-  {
-    title: 'Look ahead',
-    items: [
-      {
-        href: '/forecast',
-        title: 'Forecast',
-        subtitle: 'Projected balance and what-if scenarios',
-        icon: 'chart-line',
-      },
-      {
-        href: '/afford',
-        title: 'Can I afford this?',
-        subtitle: 'Check a purchase against your obligations',
-        icon: 'shield-check',
-      },
       {
         href: '/insights',
-        title: 'Insights & alerts',
+        title: 'Insights',
         subtitle: 'Warnings about pace, buffers and bills',
         icon: 'triangle-alert',
       },

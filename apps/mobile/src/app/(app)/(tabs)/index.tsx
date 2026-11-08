@@ -75,7 +75,7 @@ export default function HomeScreen() {
   const t = today();
 
   return (
-    <Screen title="Home" right={<SyncIndicator />} refreshing={refreshing} onRefresh={refresh}>
+    <Screen title="Overview" right={<SyncIndicator />} refreshing={refreshing} onRefresh={refresh}>
       <UpdateBanner />
       {dashboard.data?.fromCache ? (
         <Banner
