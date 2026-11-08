@@ -1,0 +1,1 @@
+ALTER TABLE "user_settings" ADD COLUMN "features" jsonb DEFAULT '{"calendar":true,"forecast":true,"budgets":true,"goals":true,"insights":true,"afford":true,"accounts":true}'::jsonb NOT NULL;
