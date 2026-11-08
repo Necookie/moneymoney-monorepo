@@ -310,77 +310,136 @@ function MonthView({
 }) {
   const weeks = monthGrid(month);
   const byDate = useMemo(() => new Map(groupByDate(occurrences, (o) => o.date)), [occurrences]);
+  // Phones: tap a day to list its items under the grid (cells are too narrow for labels).
+  const [picked, setPicked] = useState<string | null>(null);
+  const activeDay =
+    picked && picked.startsWith(month) ? picked : today.startsWith(month) ? today : `${month}-01`;
+  const dayItems = byDate.get(activeDay) ?? [];
   return (
-    <Card className={cn('overflow-hidden', dimmed && 'opacity-60')}>
-      <div className="grid grid-cols-7 border-b bg-canvas/60">
-        {WEEKDAY_SHORT.map((d) => (
-          <div key={d} className="section-label px-2 py-2 text-center">
-            {d}
-          </div>
-        ))}
-      </div>
-      <div role="grid" aria-label={`Calendar for ${formatMonth(month)}`}>
-        {weeks.map((week) => (
-          <div role="row" key={week[0]!.date} className="grid grid-cols-7 border-b last:border-b-0">
-            {week.map((day) => {
-              const items = byDate.get(day.date) ?? [];
-              const isToday = day.date === today;
-              return (
-                <div
-                  role="gridcell"
-                  key={day.date}
-                  className={cn(
-                    'group relative flex min-h-20 flex-col gap-1 border-r p-1 last:border-r-0 sm:min-h-28 sm:p-1.5',
-                    !day.inMonth && 'bg-canvas/50',
-                  )}
-                >
-                  <div className="flex items-center justify-between">
-                    <span
-                      className={cn(
-                        'tabular flex size-6 items-center justify-center rounded-full text-[12px]',
-                        isToday
-                          ? 'bg-accent font-semibold text-accent-ink'
-                          : day.inMonth
-                            ? 'text-ink'
-                            : 'text-subtle',
-                      )}
-                    >
-                      {parseIsoDate(day.date).day}
-                    </span>
+    <div className="flex flex-col gap-3">
+      <Card className={cn('overflow-hidden', dimmed && 'opacity-60')}>
+        <div className="grid grid-cols-7 border-b bg-canvas/60">
+          {WEEKDAY_SHORT.map((d) => (
+            <div key={d} className="section-label px-2 py-2 text-center">
+              {d}
+            </div>
+          ))}
+        </div>
+        <div role="grid" aria-label={`Calendar for ${formatMonth(month)}`}>
+          {weeks.map((week) => (
+            <div
+              role="row"
+              key={week[0]!.date}
+              className="grid grid-cols-7 border-b last:border-b-0"
+            >
+              {week.map((day) => {
+                const items = byDate.get(day.date) ?? [];
+                const isToday = day.date === today;
+                return (
+                  <div
+                    role="gridcell"
+                    key={day.date}
+                    aria-selected={day.date === activeDay}
+                    className={cn(
+                      'group relative flex min-h-14 flex-col gap-1 border-r p-1 last:border-r-0 sm:min-h-28 sm:p-1.5',
+                      !day.inMonth && 'bg-canvas/50',
+                      day.date === activeDay && 'bg-accent/15 sm:bg-transparent',
+                    )}
+                  >
                     <button
                       type="button"
-                      aria-label={`Plan an item on ${formatDate(day.date)}`}
-                      onClick={() => onCreate(day.date)}
-                      className="hidden size-5 cursor-pointer items-center justify-center rounded text-muted opacity-0 group-hover:opacity-100 hover:bg-hover focus-visible:opacity-100 sm:flex"
-                    >
-                      <Icon name="plus" size={12} />
-                    </button>
-                  </div>
-                  <div className="flex min-w-0 flex-col gap-0.5">
-                    {items.slice(0, 3).map((o) => (
-                      <OccurrencePill
-                        key={`${o.eventId}-${o.originalDate}`}
-                        o={o}
-                        onSelect={() => onSelect(o)}
-                      />
-                    ))}
-                    {items.length > 3 ? (
+                      aria-label={`${formatDate(day.date)}${items.length ? `, ${items.length} planned` : ''}`}
+                      onClick={() => setPicked(day.date)}
+                      className="absolute inset-0 z-0 cursor-pointer sm:hidden"
+                    />
+                    <div className="pointer-events-none relative flex items-center justify-center sm:pointer-events-auto sm:justify-between">
+                      <span
+                        className={cn(
+                          'tabular flex size-6 items-center justify-center rounded-full text-[12px]',
+                          isToday
+                            ? 'bg-accent font-semibold text-accent-ink'
+                            : day.inMonth
+                              ? 'text-ink'
+                              : 'text-subtle',
+                        )}
+                      >
+                        {parseIsoDate(day.date).day}
+                      </span>
                       <button
                         type="button"
-                        className="cursor-pointer px-1.5 text-left text-[11px] text-muted hover:text-ink"
-                        onClick={() => onSelect(items[3]!)}
+                        aria-label={`Plan an item on ${formatDate(day.date)}`}
+                        onClick={() => onCreate(day.date)}
+                        className="hidden size-5 cursor-pointer items-center justify-center rounded text-muted opacity-0 group-hover:opacity-100 hover:bg-hover focus-visible:opacity-100 sm:flex"
                       >
-                        +{items.length - 3} more
+                        <Icon name="plus" size={12} />
                       </button>
+                    </div>
+                    {items.length ? (
+                      <div
+                        aria-hidden
+                        className="mt-auto flex justify-center gap-0.5 pb-0.5 sm:hidden"
+                      >
+                        {items.slice(0, 4).map((o) => (
+                          <span
+                            key={`${o.eventId}-${o.originalDate}`}
+                            className={cn(
+                              'size-1.5 rounded-full',
+                              o.skipped || o.settled
+                                ? 'bg-subtle'
+                                : o.direction === 'inflow'
+                                  ? 'bg-positive'
+                                  : 'bg-ink',
+                            )}
+                          />
+                        ))}
+                      </div>
                     ) : null}
+                    <div className="hidden min-w-0 flex-col gap-0.5 sm:flex">
+                      {items.slice(0, 3).map((o) => (
+                        <OccurrencePill
+                          key={`${o.eventId}-${o.originalDate}`}
+                          o={o}
+                          onSelect={() => onSelect(o)}
+                        />
+                      ))}
+                      {items.length > 3 ? (
+                        <button
+                          type="button"
+                          className="cursor-pointer px-1.5 text-left text-[11px] text-muted hover:text-ink"
+                          onClick={() => onSelect(items[3]!)}
+                        >
+                          +{items.length - 3} more
+                        </button>
+                      ) : null}
+                    </div>
                   </div>
-                </div>
-              );
-            })}
-          </div>
-        ))}
-      </div>
-    </Card>
+                );
+              })}
+            </div>
+          ))}
+        </div>
+      </Card>
+      <Card className={cn('p-4 sm:hidden', dimmed && 'opacity-60')}>
+        <div className="flex items-center justify-between gap-2">
+          <p className="font-semibold">{formatDate(activeDay)}</p>
+          <Button variant="outline" size="sm" onClick={() => onCreate(activeDay)}>
+            <Icon name="plus" size={14} />
+            Plan
+          </Button>
+        </div>
+        {dayItems.length ? (
+          <ul className="mt-3 flex flex-col gap-2">
+            {dayItems.map((o) => (
+              <li key={`${o.eventId}-${o.originalDate}`}>
+                <OccurrenceRow o={o} onSelect={() => onSelect(o)} />
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="mt-2 text-sm text-muted">Nothing planned on this day.</p>
+        )}
+      </Card>
+    </div>
   );
 }
 
@@ -397,7 +456,6 @@ function TimelineView({
   onSelect: (o: OccurrenceDto) => void;
   onCreate: () => void;
 }) {
-  const { accountName } = useLookups();
   const groups = groupByDate(occurrences, (o) => o.date);
   if (groups.length === 0) {
     return (
@@ -421,8 +479,8 @@ function TimelineView({
             .filter((o) => !o.settled && !o.skipped)
             .reduce((s, o) => s + (o.direction === 'inflow' ? o.amount : -o.amount), 0);
           return (
-            <li key={date} className="flex flex-col gap-2 px-5 py-4 sm:flex-row sm:gap-6">
-              <div className="w-36 shrink-0">
+            <li key={date} className="flex flex-col gap-2 px-4 py-4 sm:flex-row sm:gap-6 sm:px-5">
+              <div className="shrink-0 sm:w-36">
                 <p className={cn('font-medium', date === today && 'text-ink')}>
                   {formatDate(date)}
                   {date === today ? (
@@ -438,78 +496,76 @@ function TimelineView({
                 ) : null}
               </div>
               <ul className="flex min-w-0 flex-1 flex-col gap-2">
-                {items.map((o) => {
-                  const inflow = o.direction === 'inflow';
-                  return (
-                    <li key={`${o.eventId}-${o.originalDate}`}>
-                      <button
-                        type="button"
-                        onClick={() => onSelect(o)}
-                        className="flex w-full cursor-pointer items-center gap-3 rounded-[10px] border px-3 py-2.5 text-left transition-colors hover:bg-canvas/60"
-                      >
-                        <span
-                          className={cn(
-                            'flex size-8 shrink-0 items-center justify-center rounded-full',
-                            inflow ? 'bg-positive-soft text-positive' : 'bg-hover',
-                          )}
-                        >
-                          <Icon name={inflow ? 'inflow' : 'outflow'} size={14} />
-                        </span>
-                        <span className="min-w-0 flex-1">
-                          <span
-                            className={cn(
-                              'block truncate text-[14px] font-medium',
-                              o.skipped && 'text-muted line-through',
-                            )}
-                          >
-                            {o.name}
-                            {o.installmentCount ? (
-                              <span className="font-normal text-muted">
-                                {' '}
-                                · {o.index}/{o.installmentCount}
-                              </span>
-                            ) : null}
-                          </span>
-                          <span className="flex flex-wrap items-center gap-1.5 text-[12px] text-muted">
-                            {EVENT_KIND_LABEL[o.kind]}
-                            {o.accountId ? <> · {accountName(o.accountId)}</> : null}
-                            {o.settled ? (
-                              <Badge tone="positive">{inflow ? 'Received' : 'Paid'}</Badge>
-                            ) : null}
-                            {o.skipped ? <Badge tone="neutral">Skipped</Badge> : null}
-                            {o.overdue && !o.settled ? (
-                              <Badge tone="negative">Overdue</Badge>
-                            ) : null}
-                            {o.rescheduled ? <Badge tone="info">Moved</Badge> : null}
-                          </span>
-                        </span>
-                        <span className="flex flex-col items-end gap-1">
-                          <span
-                            className={cn(
-                              'tabular text-[14px] font-medium',
-                              inflow
-                                ? o.confidence === 'uncertain'
-                                  ? 'text-muted'
-                                  : 'text-positive'
-                                : 'text-ink',
-                              (o.settled || o.skipped) && 'opacity-60',
-                            )}
-                          >
-                            {inflow ? '+' : '−'}
-                            {formatMoney(o.amount)}
-                          </span>
-                          <ConfidenceChip confidence={o.confidence} />
-                        </span>
-                      </button>
-                    </li>
-                  );
-                })}
+                {items.map((o) => (
+                  <li key={`${o.eventId}-${o.originalDate}`}>
+                    <OccurrenceRow o={o} onSelect={() => onSelect(o)} />
+                  </li>
+                ))}
               </ul>
             </li>
           );
         })}
       </ol>
     </Card>
+  );
+}
+
+/** One planned occurrence as a tappable row (timeline and the phone day list). */
+function OccurrenceRow({ o, onSelect }: { o: OccurrenceDto; onSelect: () => void }) {
+  const { accountName } = useLookups();
+  const inflow = o.direction === 'inflow';
+  return (
+    <button
+      type="button"
+      onClick={onSelect}
+      className="flex w-full cursor-pointer items-center gap-3 rounded-[10px] border px-3 py-2.5 text-left transition-colors hover:bg-canvas/60"
+    >
+      <span
+        className={cn(
+          'flex size-8 shrink-0 items-center justify-center rounded-full',
+          inflow ? 'bg-positive-soft text-positive' : 'bg-hover',
+        )}
+      >
+        <Icon name={inflow ? 'inflow' : 'outflow'} size={14} />
+      </span>
+      <span className="min-w-0 flex-1">
+        <span
+          className={cn(
+            'block truncate text-[14px] font-medium',
+            o.skipped && 'text-muted line-through',
+          )}
+        >
+          {o.name}
+          {o.installmentCount ? (
+            <span className="font-normal text-muted">
+              {' '}
+              · {o.index}/{o.installmentCount}
+            </span>
+          ) : null}
+        </span>
+        <span className="flex flex-wrap items-center gap-1.5 text-[12px] text-muted">
+          {EVENT_KIND_LABEL[o.kind]}
+          {o.accountId ? <> · {accountName(o.accountId)}</> : null}
+          {o.settled ? <Badge tone="positive">{inflow ? 'Received' : 'Paid'}</Badge> : null}
+          {o.skipped ? <Badge tone="neutral">Skipped</Badge> : null}
+          {o.overdue && !o.settled ? <Badge tone="negative">Overdue</Badge> : null}
+          {o.rescheduled ? <Badge tone="info">Moved</Badge> : null}
+        </span>
+      </span>
+      <span className="flex flex-col items-end gap-1">
+        <span
+          className={cn(
+            'tabular text-[14px] font-medium',
+            inflow ? (o.confidence === 'uncertain' ? 'text-muted' : 'text-positive') : 'text-ink',
+            (o.settled || o.skipped) && 'opacity-60',
+          )}
+        >
+          {inflow ? '+' : '−'}
+          {formatMoney(o.amount)}
+        </span>
+        <ConfidenceChip confidence={o.confidence} />
+      </span>
+    </button>
   );
 }
 
