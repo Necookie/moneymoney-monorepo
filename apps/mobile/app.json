@@ -3,7 +3,7 @@
     "name": "Money Money",
     "slug": "moneymoney",
     "scheme": "moneymoney",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -19,7 +19,7 @@
     },
     "android": {
       "package": "dev.necookie.moneymoney",
-      "versionCode": 10001,
+      "versionCode": 10002,
       "adaptiveIcon": {
         "backgroundColor": "#0C0A08",
         "foregroundImage": "./assets/android-icon-foreground.png",
@@ -33,7 +33,10 @@
         "android.permission.RECORD_AUDIO",
         "android.permission.SYSTEM_ALERT_WINDOW"
       ],
-      "permissions": ["android.permission.USE_BIOMETRIC", "android.permission.USE_FINGERPRINT"]
+      "permissions": [
+        "android.permission.USE_BIOMETRIC",
+        "android.permission.USE_FINGERPRINT"
+      ]
     },
     "plugins": [
       "expo-router",
