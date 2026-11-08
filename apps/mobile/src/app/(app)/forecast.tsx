@@ -23,7 +23,9 @@ import {
   Skeleton,
   Text,
 } from '@/components/ui';
+import { FeatureDisabledScreen } from '@/components/FeatureDisabled';
 import { useCachedQuery } from '@/hooks/useCachedQuery';
+import { useLocalSettings } from '@/hooks/useLocalData';
 import { errorMessage, getApi } from '@/lib/api';
 import { formatDate, formatMoney, today, tryParseMoney } from '@/lib/format';
 import { colors } from '@/lib/theme';
@@ -66,6 +68,7 @@ function Stat({
 }
 
 export default function ForecastScreen() {
+  const settings = useLocalSettings();
   const [mode, setMode] = useState<ForecastMode>('expected');
   const [range, setRange] = useState<ForecastHorizon>('90d');
   const [showWhy, setShowWhy] = useState(false);
@@ -74,6 +77,16 @@ export default function ForecastScreen() {
     getApi().forecast.get({ horizonDays: horizon, mode, historyDays: Math.min(horizon, 90) }),
   );
   const f = forecast.data?.data.forecast;
+
+  if (settings.data?.features?.forecast === false) {
+    return (
+      <FeatureDisabledScreen
+        title="Forecast"
+        featureName="Forecast"
+        description="Enable Cash Flow Forecast in Settings to explore daily projections and scenarios."
+      />
+    );
+  }
 
   const [kind, setKind] = useState<ScenarioKind>('salary_delayed');
   const [days, setDays] = useState('7');

@@ -23,7 +23,7 @@ import {
   Text,
 } from '@/components/ui';
 import { useCachedQuery } from '@/hooks/useCachedQuery';
-import { useLocalAccounts } from '@/hooks/useLocalData';
+import { useLocalAccounts, useLocalSettings } from '@/hooks/useLocalData';
 import { errorMessage, getApi } from '@/lib/api';
 import { formatDate, formatMoney, relativeDay, timeAgo, today } from '@/lib/format';
 import { syncNow } from '@/lib/sync/runtime';
@@ -54,7 +54,14 @@ export default function HomeScreen() {
     }),
   );
   const local = useLocalAccounts();
+  const settings = useLocalSettings();
   const [refreshing, setRefreshing] = useState(false);
+
+  const features = settings.data?.features;
+  const showBudgets = features?.budgets !== false;
+  const showCalendar = features?.calendar !== false;
+  const showForecast = features?.forecast !== false;
+  const showInsights = features?.insights !== false;
 
   const refresh = async () => {
     setRefreshing(true);
@@ -163,7 +170,7 @@ export default function HomeScreen() {
       )}
 
       {/* Budget */}
-      {d ? (
+      {showBudgets && d ? (
         <Pressable accessibilityRole="button" onPress={() => router.push('/budgets')}>
           <Card className="gap-2">
             <Row className="justify-between">
@@ -194,7 +201,7 @@ export default function HomeScreen() {
       ) : null}
 
       {/* Next salary / income */}
-      {d?.nextIncome ? (
+      {showCalendar && d?.nextIncome ? (
         <Card className="gap-2">
           <Row className="justify-between">
             <Label>Next income</Label>
@@ -218,54 +225,56 @@ export default function HomeScreen() {
       ) : null}
 
       {/* Cash-flow chart */}
-      <Card className="gap-3">
-        <Row className="justify-between">
-          <Label>Cash flow</Label>
-          {forecast.data?.fromCache ? <Text className="text-xs text-muted">cached</Text> : null}
-        </Row>
-        <Segmented options={RANGES} value={range} onChange={setRange} />
-        {forecast.data ? (
-          <CashFlowChart
-            actual={forecast.data.data.history}
-            projected={forecast.data.data.forecast.points.map((p) => ({
-              date: p.date,
-              balance: p.balance,
-            }))}
-            today={forecast.data.data.forecast.asOf}
-            buffer={forecast.data.data.forecast.safetyBuffer}
-          />
-        ) : forecast.isError ? (
-          <Text className="text-sm text-muted">{errorMessage(forecast.error)}</Text>
-        ) : (
-          <Skeleton className="h-48 w-full" />
-        )}
-        {d ? (
-          <>
-            <Divider />
-            <Row className="justify-between">
-              <Text className="text-sm text-muted">Projected month-end</Text>
-              {d.projectedMonthEnd === null ? (
-                <Text className="text-sm text-muted">—</Text>
-              ) : (
-                <Money value={d.projectedMonthEnd} tone="auto" className="text-sm" />
-              )}
-            </Row>
-            <Row className="justify-between">
-              <Text className="text-sm text-muted">Lowest in next 30 days</Text>
-              <Text
-                tabular
-                weight="semibold"
-                className={`text-sm ${d.lowest30.balance < 0 ? 'text-negative' : 'text-ink'}`}
-              >
-                {formatMoney(d.lowest30.balance)} · {formatDate(d.lowest30.date, false)}
-              </Text>
-            </Row>
-          </>
-        ) : null}
-      </Card>
+      {showForecast ? (
+        <Card className="gap-3">
+          <Row className="justify-between">
+            <Label>Cash flow</Label>
+            {forecast.data?.fromCache ? <Text className="text-xs text-muted">cached</Text> : null}
+          </Row>
+          <Segmented options={RANGES} value={range} onChange={setRange} />
+          {forecast.data ? (
+            <CashFlowChart
+              actual={forecast.data.data.history}
+              projected={forecast.data.data.forecast.points.map((p) => ({
+                date: p.date,
+                balance: p.balance,
+              }))}
+              today={forecast.data.data.forecast.asOf}
+              buffer={forecast.data.data.forecast.safetyBuffer}
+            />
+          ) : forecast.isError ? (
+            <Text className="text-sm text-muted">{errorMessage(forecast.error)}</Text>
+          ) : (
+            <Skeleton className="h-48 w-full" />
+          )}
+          {d ? (
+            <>
+              <Divider />
+              <Row className="justify-between">
+                <Text className="text-sm text-muted">Projected month-end</Text>
+                {d.projectedMonthEnd === null ? (
+                  <Text className="text-sm text-muted">—</Text>
+                ) : (
+                  <Money value={d.projectedMonthEnd} tone="auto" className="text-sm" />
+                )}
+              </Row>
+              <Row className="justify-between">
+                <Text className="text-sm text-muted">Lowest in next 30 days</Text>
+                <Text
+                  tabular
+                  weight="semibold"
+                  className={`text-sm ${d.lowest30.balance < 0 ? 'text-negative' : 'text-ink'}`}
+                >
+                  {formatMoney(d.lowest30.balance)} · {formatDate(d.lowest30.date, false)}
+                </Text>
+              </Row>
+            </>
+          ) : null}
+        </Card>
+      ) : null}
 
       {/* Upcoming */}
-      {d ? (
+      {showCalendar && d ? (
         <Card className="gap-1">
           <Row className="justify-between pb-1">
             <Label>Upcoming</Label>
@@ -319,7 +328,7 @@ export default function HomeScreen() {
       ) : null}
 
       {/* Health + alerts */}
-      {d ? (
+      {showInsights && d ? (
         <Pressable accessibilityRole="button" onPress={() => router.push('/insights')}>
           <Card className="flex-row items-center gap-4">
             <View

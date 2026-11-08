@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { View } from 'react-native';
 import { Icon } from '@/components/Icon';
 import { Screen } from '@/components/Screen';
+import { FeatureDisabledScreen } from '@/components/FeatureDisabled';
 import {
   Banner,
   Button,
@@ -17,6 +18,7 @@ import {
   Text,
 } from '@/components/ui';
 import { useCachedQuery } from '@/hooks/useCachedQuery';
+import { useLocalSettings } from '@/hooks/useLocalData';
 import { errorMessage, getApi } from '@/lib/api';
 import { formatDate, formatMoney } from '@/lib/format';
 import { colors } from '@/lib/theme';
@@ -79,9 +81,20 @@ function AlertCard({
 }
 
 export default function InsightsScreen() {
+  const settings = useLocalSettings();
   const qc = useQueryClient();
   const [status, setStatus] = useState<'active' | 'dismissed'>('active');
   const alerts = useCachedQuery(['alerts', status], () => getApi().alerts.list(status));
+
+  if (settings.data?.features?.insights === false) {
+    return (
+      <FeatureDisabledScreen
+        title="Insights"
+        featureName="Insights"
+        description="Enable Insights in Settings to view automated spending pace alerts and financial warnings."
+      />
+    );
+  }
   const dismiss = useMutation({
     mutationFn: (id: string) => getApi().alerts.dismiss(id),
     onSuccess: async () => {

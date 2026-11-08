@@ -5,6 +5,7 @@ import { Pressable, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Icon, type IconName } from '@/components/Icon';
 import { Text } from '@/components/ui';
+import { useLocalSettings } from '@/hooks/useLocalData';
 import { colors } from '@/lib/theme';
 
 /** Same names, order and centre "add" action as the web app's phone tab bar. */
@@ -21,7 +22,13 @@ const TABS: Record<string, { label: string; icon: IconName }> = {
  */
 function TabBar({ state, emitter, navigateToTab }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
-  const routes = state.routes.filter((r) => r.name in TABS);
+  const settings = useLocalSettings();
+  const showPlan = settings.data?.features?.calendar !== false;
+  const routes = state.routes.filter((r) => {
+    if (!(r.name in TABS)) return false;
+    if (r.name === 'plan' && !showPlan) return false;
+    return true;
+  });
   const left = routes.slice(0, 2);
   const right = routes.slice(2);
 
@@ -99,11 +106,13 @@ function TabBar({ state, emitter, navigateToTab }: BottomTabBarProps) {
 }
 
 export default function TabsLayout() {
+  const settings = useLocalSettings();
+  const showPlan = settings.data?.features?.calendar !== false;
   return (
     <Tabs tabBar={(props) => <TabBar {...props} />} screenOptions={{ headerShown: false }}>
       <Tabs.Screen name="index" />
       <Tabs.Screen name="activity" />
-      <Tabs.Screen name="plan" />
+      <Tabs.Screen name="plan" options={{ href: showPlan ? undefined : null }} />
       <Tabs.Screen name="more" />
     </Tabs>
   );

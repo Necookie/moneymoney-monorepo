@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto';
+import { DEFAULT_APP_FEATURES } from '@mm/types';
 import type {
   Account,
   SyncOperation,
@@ -238,6 +239,7 @@ export class FakeServer implements SyncApi {
         safetyBuffer: 0,
         emergencyFundGoalId: null,
         demoMode: false,
+        features: DEFAULT_APP_FEATURES,
         updatedAt: serverTime,
       },
     };

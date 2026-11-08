@@ -1,5 +1,6 @@
 import { useClerk } from '@clerk/expo';
 import { toDecimalString } from '@mm/finance-engine';
+import { DEFAULT_APP_FEATURES, type AppFeature, type AppFeatures } from '@mm/types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import * as Application from 'expo-application';
 import { openDownload, useAppUpdate } from '@/lib/updates';
@@ -24,6 +25,47 @@ import { formatMoney, timeAgo, tryParseMoney } from '@/lib/format';
 import * as Notif from '@/lib/notifications';
 import { signOutEverywhere } from '@/lib/session';
 import { getSyncRuntime, syncNow, useSyncStatus } from '@/lib/sync/runtime';
+
+const FEATURE_KEYS: AppFeature[] = [
+  'calendar',
+  'forecast',
+  'afford',
+  'budgets',
+  'goals',
+  'accounts',
+  'insights',
+];
+
+const FEATURE_METADATA: Record<AppFeature, { title: string; body: string }> = {
+  calendar: {
+    title: 'Financial Calendar',
+    body: 'Plan future bills, salary, and recurring expense schedules.',
+  },
+  forecast: {
+    title: 'Cash Flow Forecast',
+    body: 'Explore projected balances and what-if scenarios.',
+  },
+  afford: {
+    title: 'Can I afford this?',
+    body: 'Check planned purchases against upcoming obligations.',
+  },
+  budgets: {
+    title: 'Budgets',
+    body: 'Monthly spending limits and daily spending allowances.',
+  },
+  goals: {
+    title: 'Goals',
+    body: 'Track savings targets and safeguard your emergency reserve.',
+  },
+  accounts: {
+    title: 'Accounts',
+    body: 'View account balances and manage financial accounts.',
+  },
+  insights: {
+    title: 'Insights',
+    body: 'Spending pace warnings and automated financial health alerts.',
+  },
+};
 
 function SettingRow({
   title,
@@ -64,6 +106,31 @@ export default function SettingsScreen() {
   const [bgStatus, setBgStatus] = useState<string>('…');
   const [buffer, setBuffer] = useState('');
   const [syncing, setSyncing] = useState(false);
+
+  const [localFeatures, setLocalFeatures] = useState<AppFeatures>(() => ({
+    ...DEFAULT_APP_FEATURES,
+    ...(settings.data?.features ?? {}),
+  }));
+
+  useEffect(() => {
+    if (settings.data?.features) {
+      setLocalFeatures({ ...DEFAULT_APP_FEATURES, ...settings.data.features });
+    }
+  }, [settings.data?.features]);
+
+  const toggleFeature = async (feature: AppFeature, next: boolean) => {
+    const previous = localFeatures;
+    const updated = { ...localFeatures, [feature]: next };
+    setLocalFeatures(updated);
+    try {
+      await getApi().settings.update({ features: { [feature]: next } });
+      await syncNow({ force: true }).catch(() => undefined);
+      await qc.invalidateQueries();
+    } catch (err) {
+      setLocalFeatures(previous);
+      Alert.alert('Could not update feature', errorMessage(err));
+    }
+  };
 
   useEffect(() => {
     (async () => {
@@ -206,6 +273,25 @@ export default function SettingsScreen() {
             onPress={() => router.navigate('/activity')}
           />
         ) : null}
+      </Card>
+
+      <Label className="px-1 pt-2">Features</Label>
+      <Card className="gap-0 py-1">
+        {FEATURE_KEYS.map((key, i) => {
+          const meta = FEATURE_METADATA[key];
+          const enabled = localFeatures[key];
+          return (
+            <View key={key}>
+              {i > 0 ? <Divider /> : null}
+              <SettingRow
+                title={meta.title}
+                body={meta.body}
+                value={enabled}
+                onChange={(next) => void toggleFeature(key, next)}
+              />
+            </View>
+          );
+        })}
       </Card>
 
       <Label className="px-1 pt-2">Security & alerts</Label>

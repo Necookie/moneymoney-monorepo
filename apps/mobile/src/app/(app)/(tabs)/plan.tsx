@@ -32,8 +32,9 @@ import {
   Skeleton,
   Text,
 } from '@/components/ui';
+import { FeatureDisabledScreen } from '@/components/FeatureDisabled';
 import { useCachedQuery } from '@/hooks/useCachedQuery';
-import { useLocalAccounts, useLocalUpcoming } from '@/hooks/useLocalData';
+import { useLocalAccounts, useLocalSettings, useLocalUpcoming } from '@/hooks/useLocalData';
 import { errorMessage, getApi } from '@/lib/api';
 import { formatMoney, relativeDay, today, tryParseMoney } from '@/lib/format';
 import * as Notif from '@/lib/notifications';
@@ -291,6 +292,7 @@ function OccurrenceSheet({ o, onClose }: { o: OccurrenceDto | null; onClose: () 
 }
 
 export default function PlanScreen() {
+  const settings = useLocalSettings();
   const [view, setView] = useState<PlanView>('timeline');
   const t = today();
   const [month, setMonth] = useState(t);
@@ -298,6 +300,16 @@ export default function PlanScreen() {
   const [active, setActive] = useState<OccurrenceDto | null>(null);
   const from = view === 'timeline' ? addDays(t, -14) : startOfMonth(month);
   const to = view === 'timeline' ? addDays(t, 90) : endOfMonth(month);
+
+  if (settings.data?.features?.calendar === false) {
+    return (
+      <FeatureDisabledScreen
+        title="Calendar"
+        featureName="Financial Calendar"
+        description="Enable Financial Calendar in Settings to plan upcoming bills, salaries, and recurring schedules."
+      />
+    );
+  }
   const occ = useCachedQuery(['occurrences', from, to], () =>
     getApi().planner.occurrences(from, to),
   );

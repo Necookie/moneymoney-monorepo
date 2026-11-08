@@ -1,25 +1,29 @@
+import type { AppFeature } from '@mm/types';
 import { router, type Href } from 'expo-router';
 import { View } from 'react-native';
 import type { IconName } from '@/components/Icon';
 import { Screen } from '@/components/Screen';
 import { SyncIndicator } from '@/components/SyncIndicator';
 import { Card, Divider, Label, ListRow, Text } from '@/components/ui';
+import { useLocalSettings } from '@/hooks/useLocalData';
 
 /** Mirrors the web sidebar order: Forecast, Budgets, Goals, Accounts, Insights, Settings. */
 const SECTIONS: {
   title: string;
-  items: { href: Href; title: string; subtitle: string; icon: IconName }[];
+  items: { href: Href; title: string; subtitle: string; icon: IconName; feature?: AppFeature }[];
 }[] = [
   {
     title: 'Look ahead',
     items: [
       {
+        feature: 'forecast',
         href: '/forecast',
         title: 'Forecast',
         subtitle: 'Projected balance and what-if scenarios',
         icon: 'chart-line',
       },
       {
+        feature: 'afford',
         href: '/afford',
         title: 'Can I afford this?',
         subtitle: 'Check a purchase against your obligations',
@@ -31,19 +35,28 @@ const SECTIONS: {
     title: 'Money',
     items: [
       {
+        feature: 'budgets',
         href: '/budgets',
         title: 'Budgets',
         subtitle: 'Monthly limits and daily allowance',
         icon: 'chart-pie',
       },
-      { href: '/goals', title: 'Goals', subtitle: 'Savings targets and allocations', icon: 'flag' },
       {
+        feature: 'goals',
+        href: '/goals',
+        title: 'Goals',
+        subtitle: 'Savings targets and allocations',
+        icon: 'flag',
+      },
+      {
+        feature: 'accounts',
         href: '/accounts',
         title: 'Accounts',
         subtitle: 'Balances, including unsynced changes',
         icon: 'wallet',
       },
       {
+        feature: 'insights',
         href: '/insights',
         title: 'Insights',
         subtitle: 'Warnings about pace, buffers and bills',
@@ -65,9 +78,17 @@ const SECTIONS: {
 ];
 
 export default function MoreScreen() {
+  const settings = useLocalSettings();
+  const features = settings.data?.features;
+
+  const activeSections = SECTIONS.map((s) => ({
+    ...s,
+    items: s.items.filter((item) => !item.feature || features?.[item.feature] !== false),
+  })).filter((s) => s.items.length > 0);
+
   return (
     <Screen title="More" right={<SyncIndicator />}>
-      {SECTIONS.map((s) => (
+      {activeSections.map((s) => (
         <View key={s.title} className="gap-1.5">
           <Label className="px-1 pt-2">{s.title}</Label>
           <Card className="gap-0 py-1">
