@@ -1,8 +1,25 @@
 import { useSignIn } from '@clerk/expo';
-import { useState } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
+import { useSSO } from '@clerk/expo/experimental';
+import * as WebBrowser from 'expo-web-browser';
+import { useEffect, useState } from 'react';
+import {
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { GoogleMark } from '@/components/GoogleMark';
 import { Banner, Button, Field, Text } from '@/components/ui';
+import { colors } from '@/lib/theme';
+
+// Completes a pending browser auth session if the app was reopened through the redirect URL.
+WebBrowser.maybeCompleteAuthSession();
+
+/** Must be allow-listed in Clerk (Native applications → redirect URLs). */
+const SSO_REDIRECT_URL = 'moneymoney://sso-callback';
 
 type Step = 'credentials' | 'second-factor';
 type Factor = 'email_code' | 'totp' | 'phone_code';
@@ -30,13 +47,24 @@ function messageOf(err: unknown): string {
  */
 export default function SignInScreen() {
   const { signIn, errors, fetchStatus } = useSignIn();
+  const { startSSOFlow } = useSSO();
+  const [googleBusy, setGoogleBusy] = useState(false);
   const [step, setStep] = useState<Step>('credentials');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [code, setCode] = useState('');
   const [factor, setFactor] = useState<Factor>('email_code');
   const [error, setError] = useState<string | null>(null);
-  const busy = fetchStatus === 'fetching';
+  const busy = fetchStatus === 'fetching' && !googleBusy;
+
+  // Opening the Custom Tab is noticeably faster on Android when the browser is warmed up.
+  useEffect(() => {
+    if (Platform.OS !== 'android') return;
+    WebBrowser.warmUpAsync().catch(() => undefined);
+    return () => {
+      WebBrowser.coolDownAsync().catch(() => undefined);
+    };
+  }, []);
 
   const finish = async () => {
     const { error: finalizeError } = await signIn.finalize();
@@ -73,6 +101,33 @@ export default function SignInScreen() {
       return startSecondFactor();
     }
     setError('This sign-in needs a step the app does not support. Use the web app to finish it.');
+  };
+
+  /** Same Google account sign-in as the web app (Clerk OAuth in a browser auth session). */
+  const continueWithGoogle = async () => {
+    setError(null);
+    setGoogleBusy(true);
+    try {
+      const { createdSessionId, authSessionResult } = await startSSOFlow({
+        strategy: 'oauth_google',
+        redirectUrl: SSO_REDIRECT_URL,
+        oidcPrompt: 'select_account',
+      });
+      // Session created and activated: the root navigator's guard switches to the app.
+      if (createdSessionId) return;
+      // Cancelled / dismissed the browser: nothing to report.
+      if (authSessionResult && authSessionResult.type !== 'success') return;
+      if (signIn.status === 'needs_second_factor' || signIn.status === 'needs_client_trust') {
+        return await startSecondFactor();
+      }
+      setError(
+        'Google sign-in did not finish. Only the owner’s Google account can sign in to this instance.',
+      );
+    } catch (err) {
+      setError(messageOf(err));
+    } finally {
+      setGoogleBusy(false);
+    }
   };
 
   const submitCode = async () => {
@@ -119,6 +174,24 @@ export default function SignInScreen() {
           <View className="gap-4 py-10">
             {step === 'credentials' ? (
               <>
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel="Continue with Google"
+                  accessibilityState={{ disabled: googleBusy || busy, busy: googleBusy }}
+                  disabled={googleBusy || busy}
+                  onPress={continueWithGoogle}
+                  className={`h-14 flex-row items-center justify-center gap-3 rounded-button border border-border-strong bg-card px-4 ${googleBusy || busy ? 'opacity-50' : 'active:opacity-80'}`}
+                >
+                  {googleBusy ? <ActivityIndicator color={colors.ink} /> : <GoogleMark />}
+                  <Text weight="semibold" className="text-lg">
+                    Continue with Google
+                  </Text>
+                </Pressable>
+                <View className="flex-row items-center gap-3">
+                  <View className="h-px flex-1 bg-border" />
+                  <Text className="text-sm text-muted">or with email</Text>
+                  <View className="h-px flex-1 bg-border" />
+                </View>
                 <Field
                   label="Email"
                   value={email}
@@ -146,7 +219,7 @@ export default function SignInScreen() {
                   variant="primary"
                   size="lg"
                   loading={busy}
-                  disabled={!email.trim() || !password}
+                  disabled={!email.trim() || !password || googleBusy}
                   onPress={submitCredentials}
                 />
               </>
