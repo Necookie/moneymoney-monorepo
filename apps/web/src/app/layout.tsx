@@ -20,6 +20,8 @@ export const viewport: Viewport = {
   themeColor: '#F4F2F0',
   width: 'device-width',
   initialScale: 1,
+  // Lets the layout use env(safe-area-inset-*) on notched phones and installed web apps.
+  viewportFit: 'cover',
 };
 
 const clerkAppearance = {

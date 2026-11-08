@@ -17,7 +17,7 @@ import { useTransactionDialog } from '@/features/transactions/transaction-dialog
 import { isApiError, isPrivateInstanceError, useApi } from '@/lib/api';
 import { useMe } from '@/lib/queries';
 import { cn } from '@/lib/utils';
-import { isActive, NAV_ITEMS } from './nav';
+import { isActive, MOBILE_TABS, NAV_ITEMS } from './nav';
 
 const COLLAPSE_KEY = 'mm.sidebar.collapsed';
 
@@ -84,35 +84,20 @@ export function AppShell({ children }: { children: ReactNode }) {
 
       <div className="flex min-w-0 flex-1 flex-col">
         {/* Mobile top bar */}
-        <header className="sticky top-0 z-40 flex h-14 items-center justify-between gap-2 border-b bg-canvas/95 px-3 backdrop-blur lg:hidden">
-          <Dialog open={mobileOpen} onOpenChange={setMobileOpen}>
-            <DialogTrigger asChild>
-              <Button variant="ghost" size="icon" aria-label="Open navigation">
-                <Icon name="menu" size={20} />
-              </Button>
-            </DialogTrigger>
-            <SheetContent title="Navigation">
-              <SidebarContents collapsed={false} />
-            </SheetContent>
-          </Dialog>
-          <Link href="/" aria-label="money money. — Overview">
-            <Wordmark />
-          </Link>
-          <Button
-            variant="primary"
-            size="icon"
-            aria-label="Add transaction"
-            onClick={() => openCreate()}
-          >
-            <Icon name="plus" size={20} />
-          </Button>
+        <header className="sticky top-0 z-40 border-b bg-canvas/95 pt-[env(safe-area-inset-top)] backdrop-blur lg:hidden">
+          <div className="flex h-14 items-center justify-between gap-2 px-4">
+            <Link href="/" aria-label="money money. — Overview" className="rounded-sm">
+              <Wordmark />
+            </Link>
+            <UserButton />
+          </div>
         </header>
 
         {me.data?.settings.demoMode ? <DemoBanner /> : null}
 
         <main
           id="main"
-          className="mx-auto w-full max-w-[1280px] flex-1 px-4 py-6 sm:px-6 lg:px-10 lg:py-9"
+          className="mx-auto w-full max-w-[1280px] flex-1 px-4 pt-5 pb-[calc(96px+env(safe-area-inset-bottom))] sm:px-6 sm:pt-6 lg:px-10 lg:py-9"
         >
           {me.isPending ? (
             <ShellSkeleton />
@@ -142,7 +127,93 @@ export function AppShell({ children }: { children: ReactNode }) {
           )}
         </main>
       </div>
+
+      <MobileTabBar
+        pathname={pathname}
+        moreOpen={mobileOpen}
+        onMoreOpenChange={setMobileOpen}
+        onAdd={() => openCreate()}
+      />
     </div>
+  );
+}
+
+/** Phone navigation: Overview · Transactions · (+) · Calendar · More — mirrors the Android app. */
+function MobileTabBar({
+  pathname,
+  moreOpen,
+  onMoreOpenChange,
+  onAdd,
+}: {
+  pathname: string;
+  moreOpen: boolean;
+  onMoreOpenChange: (open: boolean) => void;
+  onAdd: () => void;
+}) {
+  const onTab = MOBILE_TABS.some((t) => isActive(pathname, t.href));
+  const tab = (item: (typeof MOBILE_TABS)[number]) => {
+    const active = isActive(pathname, item.href);
+    return (
+      <Link
+        key={item.href}
+        href={item.href}
+        aria-current={active ? 'page' : undefined}
+        className={cn(
+          'flex min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-button py-1.5 text-[11px] leading-4 transition-colors',
+          active ? 'font-semibold text-ink' : 'text-muted hover:text-ink',
+        )}
+      >
+        <Icon name={item.icon} size={22} />
+        <span
+          aria-hidden
+          className={cn('h-1 w-5 rounded-full', active ? 'bg-accent' : 'bg-transparent')}
+        />
+        <span className="max-w-full truncate">{item.label}</span>
+      </Link>
+    );
+  };
+  return (
+    <nav
+      aria-label="Primary"
+      className="fixed inset-x-0 bottom-0 z-40 border-t bg-card/95 pb-[env(safe-area-inset-bottom)] backdrop-blur lg:hidden"
+    >
+      <div className="mx-auto flex h-16 max-w-xl items-center px-2">
+        {MOBILE_TABS.slice(0, 2).map(tab)}
+        <div className="flex flex-1 justify-center">
+          <button
+            type="button"
+            onClick={onAdd}
+            aria-label="Add transaction"
+            className="-mt-5 flex size-14 cursor-pointer items-center justify-center rounded-full border-[3px] border-ink bg-accent text-accent-ink shadow-popover transition-colors hover:bg-accent-hover active:scale-95"
+          >
+            <Icon name="plus" size={26} />
+          </button>
+        </div>
+        {MOBILE_TABS.slice(2).map(tab)}
+        <Dialog open={moreOpen} onOpenChange={onMoreOpenChange}>
+          <DialogTrigger asChild>
+            <button
+              type="button"
+              aria-current={!onTab ? 'page' : undefined}
+              className={cn(
+                'flex min-w-0 flex-1 cursor-pointer flex-col items-center justify-center gap-1 rounded-button py-1.5 text-[11px] leading-4 transition-colors',
+                !onTab ? 'font-semibold text-ink' : 'text-muted hover:text-ink',
+              )}
+            >
+              <Icon name="menu" size={22} />
+              <span
+                aria-hidden
+                className={cn('h-1 w-5 rounded-full', !onTab ? 'bg-accent' : 'bg-transparent')}
+              />
+              More
+            </button>
+          </DialogTrigger>
+          <SheetContent title="Navigation">
+            <SidebarContents collapsed={false} />
+          </SheetContent>
+        </Dialog>
+      </div>
+    </nav>
   );
 }
 

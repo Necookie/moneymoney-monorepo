@@ -7,6 +7,8 @@ export function Toaster() {
     <Sonner
       position="bottom-right"
       closeButton
+      // Phones: keep toasts above the bottom tab bar.
+      mobileOffset={{ bottom: 'calc(84px + env(safe-area-inset-bottom))' }}
       toastOptions={{
         classNames: {
           toast:
