@@ -108,6 +108,12 @@ export async function deleteEvent(db: Database, userId: string, id: string) {
   });
 }
 
+const ALREADY_PAID = 'This occurrence is already paid. Delete its transaction to change it.';
+
+function assertNotPaid(row: EventRow) {
+  if (row.status === 'paid') throw unprocessable(ALREADY_PAID);
+}
+
 function isSeries(row: EventRow) {
   return row.frequency !== 'none' || (row.installments ?? 0) > 1;
 }
@@ -133,6 +139,19 @@ async function upsertOverride(
     newDate?: string | null;
   },
 ) {
+  // A paid occurrence is realised by a live transaction; turning it into a skip/reschedule would
+  // drop that link and (for reschedule) project it again — double counting.
+  const [current] = await db
+    .select({ action: occurrenceOverrides.action })
+    .from(occurrenceOverrides)
+    .where(
+      and(
+        eq(occurrenceOverrides.eventId, values.eventId),
+        eq(occurrenceOverrides.occurrenceDate, values.occurrenceDate),
+        eq(occurrenceOverrides.userId, userId),
+      ),
+    );
+  if (current?.action === 'paid') throw unprocessable(ALREADY_PAID);
   const [row] = await db
     .insert(occurrenceOverrides)
     .values({ userId, ...values })
@@ -154,6 +173,7 @@ export async function postpone(
 ) {
   const row = await getEvent(db, userId, id);
   if (!isSeries(row)) {
+    assertNotPaid(row);
     if (row.endDate && newDate > row.endDate) throw unprocessable('New date is after the end date');
     return updateEvent(db, userId, id, { startDate: newDate });
   }
@@ -164,7 +184,10 @@ export async function postpone(
 
 export async function skip(db: Database, userId: string, id: string, occurrenceDate: string) {
   const row = await getEvent(db, userId, id);
-  if (!isSeries(row)) return updateEvent(db, userId, id, { status: 'cancelled' });
+  if (!isSeries(row)) {
+    assertNotPaid(row);
+    return updateEvent(db, userId, id, { status: 'cancelled' });
+  }
   assertOccurrence(row, occurrenceDate);
   await upsertOverride(db, userId, { eventId: id, occurrenceDate, action: 'skip' });
   return getEvent(db, userId, id);
@@ -180,6 +203,7 @@ export async function split(
   const row = await getEvent(db, userId, id);
   if (isSeries(row))
     throw unprocessable('Only one-off items can be split; edit installments instead');
+  assertNotPaid(row);
   if (input.amount >= row.amount)
     throw unprocessable('The split amount must be less than the full amount');
   return db.transaction(async (tx) => {
@@ -225,6 +249,20 @@ export async function markPaid(
   const row = await getEvent(db, userId, id);
   if (row.status === 'cancelled') throw unprocessable('This item was cancelled');
   const index = assertOccurrence(row, input.occurrenceDate);
+  // A retry with the same transactionId is idempotent; a second payment with a new id would
+  // record the money twice and re-point the paid marker.
+  const [paid] = await db
+    .select({ transactionId: occurrenceOverrides.transactionId })
+    .from(occurrenceOverrides)
+    .where(
+      and(
+        eq(occurrenceOverrides.eventId, row.id),
+        eq(occurrenceOverrides.occurrenceDate, input.occurrenceDate),
+        eq(occurrenceOverrides.userId, userId),
+        eq(occurrenceOverrides.action, 'paid'),
+      ),
+    );
+  if (paid && paid.transactionId !== input.transactionId) throw unprocessable(ALREADY_PAID);
   const accountId = input.accountId ?? row.accountId;
   if (!accountId) throw unprocessable('Choose the account the money moved through');
   const settings = await getSettings(db, userId);

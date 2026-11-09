@@ -1,6 +1,8 @@
+import { goals } from '@mm/database';
 import { me, settings, updateSettings } from '@mm/validation';
+import { and, eq } from 'drizzle-orm';
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
-import { badRequest } from '../../lib/errors.js';
+import { badRequest, unprocessable } from '../../lib/errors.js';
 import { toSettingsDto } from '../../lib/mappers.js';
 import { getSettings, updateSettings as saveSettings } from './repository.js';
 
@@ -37,6 +39,14 @@ export const settingsRoutes: FastifyPluginAsyncZod = async (app) => {
         } catch {
           throw badRequest('Unknown timezone');
         }
+      }
+      const goalId = request.body.emergencyFundGoalId;
+      if (goalId) {
+        const [owned] = await app.db
+          .select({ id: goals.id })
+          .from(goals)
+          .where(and(eq(goals.id, goalId), eq(goals.userId, request.auth.userId)));
+        if (!owned) throw unprocessable('Goal not found');
       }
       return toSettingsDto(await saveSettings(app.db, request.auth.userId, request.body));
     },

@@ -77,14 +77,23 @@ export const errorResponse = z.object({
 export type ErrorResponse = z.infer<typeof errorResponse>;
 
 // ── Settings ─────────────────────────────────────────────────────────────
+const appFeatureFields = {
+  calendar: z.boolean(),
+  forecast: z.boolean(),
+  budgets: z.boolean(),
+  goals: z.boolean(),
+  insights: z.boolean(),
+  afford: z.boolean(),
+  accounts: z.boolean(),
+};
 export const appFeatures = z.object({
-  calendar: z.boolean().default(true),
-  forecast: z.boolean().default(true),
-  budgets: z.boolean().default(true),
-  goals: z.boolean().default(true),
-  insights: z.boolean().default(true),
-  afford: z.boolean().default(true),
-  accounts: z.boolean().default(true),
+  calendar: appFeatureFields.calendar.default(true),
+  forecast: appFeatureFields.forecast.default(true),
+  budgets: appFeatureFields.budgets.default(true),
+  goals: appFeatureFields.goals.default(true),
+  insights: appFeatureFields.insights.default(true),
+  afford: appFeatureFields.afford.default(true),
+  accounts: appFeatureFields.accounts.default(true),
 });
 export type AppFeatures = z.infer<typeof appFeatures>;
 
@@ -104,7 +113,9 @@ export const updateSettings = z
     timezone: z.string().min(1).max(64),
     safetyBuffer: nonNegativeCentavos,
     emergencyFundGoalId: uuid.nullable(),
-    features: appFeatures.partial(),
+    // No inner defaults: in Zod 4 `.partial()` still applies them, so toggling one feature
+    // would silently re-enable every other one.
+    features: z.object(appFeatureFields).partial(),
   })
   .partial();
 export type UpdateSettings = z.infer<typeof updateSettings>;
@@ -518,7 +529,7 @@ export type UpdateBudget = z.infer<typeof updateBudget>;
 export const budgetQuery = z.object({
   month: z
     .string()
-    .regex(/^\d{4}-\d{2}$/)
+    .regex(/^\d{4}-(0[1-9]|1[0-2])$/, 'Expected YYYY-MM')
     .optional(),
 });
 
@@ -835,7 +846,11 @@ export type SyncOpResult = z.infer<typeof syncOpResult>;
 export const syncPushResponse = z.object({ results: z.array(syncOpResult), serverTime: timestamp });
 export type SyncPushResponse = z.infer<typeof syncPushResponse>;
 
-export const syncPullQuery = z.object({ since: timestamp.optional() });
+export const syncPullQuery = z.object({
+  since: timestamp
+    .refine((s) => !Number.isNaN(Date.parse(s)), 'Expected an ISO-8601 timestamp')
+    .optional(),
+});
 export const syncPullResponse = z.object({
   serverTime: timestamp,
   accounts: z.array(account),

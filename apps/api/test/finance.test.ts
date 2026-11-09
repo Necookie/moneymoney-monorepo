@@ -336,6 +336,104 @@ describe('future expense planner & forecasting', () => {
     expect((await t.owner.get(`/scheduled-events/${laptop}`)).body.status).toBe('committed');
   });
 
+  it('refuses to postpone or skip an occurrence that is already paid', async () => {
+    const rent = (
+      await t.owner.post('/scheduled-events', {
+        name: 'Rent',
+        direction: 'outflow',
+        kind: 'bill',
+        status: 'recurring',
+        amount: peso(12_000),
+        accountId: bank,
+        startDate: ahead(5),
+        recurrence: { frequency: 'monthly' },
+      })
+    ).body;
+    const txId = id();
+    expect(
+      (
+        await t.owner.post(`/scheduled-events/${rent.id}/mark-paid`, {
+          occurrenceDate: ahead(5),
+          transactionId: txId,
+        })
+      ).status,
+    ).toBe(201);
+    // Retrying with the same transactionId is idempotent; paying again with a new id is refused.
+    expect(
+      (
+        await t.owner.post(`/scheduled-events/${rent.id}/mark-paid`, {
+          occurrenceDate: ahead(5),
+          transactionId: txId,
+        })
+      ).status,
+    ).toBeLessThan(300);
+    expect(
+      (
+        await t.owner.post(`/scheduled-events/${rent.id}/mark-paid`, {
+          occurrenceDate: ahead(5),
+          transactionId: id(),
+        })
+      ).status,
+    ).toBe(422);
+    const moved = await t.owner.post(`/scheduled-events/${rent.id}/postpone`, {
+      occurrenceDate: ahead(5),
+      newDate: ahead(9),
+    });
+    expect(moved.status).toBe(422);
+    expect(
+      (await t.owner.post(`/scheduled-events/${rent.id}/skip`, { occurrenceDate: ahead(5) }))
+        .status,
+    ).toBe(422);
+    // Still settled and linked; not projected again on the would-be new date.
+    const occ = (
+      await t.owner.get(`/scheduled-events/occurrences?from=${today}&to=${ahead(20)}`)
+    ).body.filter((o: { eventId: string }) => o.eventId === rent.id);
+    expect(occ).toHaveLength(1);
+    expect(occ[0]).toMatchObject({
+      originalDate: ahead(5),
+      settled: true,
+      settledTransactionId: txId,
+    });
+
+    // A paid one-off cannot be postponed, cancelled via skip, or split either.
+    const oneOff = (
+      await t.owner.post('/scheduled-events', {
+        name: 'Phone repair',
+        direction: 'outflow',
+        kind: 'expense',
+        amount: peso(3_000),
+        accountId: cash,
+        startDate: ahead(2),
+      })
+    ).body;
+    await t.owner.post(`/scheduled-events/${oneOff.id}/mark-paid`, {
+      occurrenceDate: ahead(2),
+      transactionId: id(),
+    });
+    expect(
+      (
+        await t.owner.post(`/scheduled-events/${oneOff.id}/postpone`, {
+          occurrenceDate: ahead(2),
+          newDate: ahead(6),
+        })
+      ).status,
+    ).toBe(422);
+    expect(
+      (await t.owner.post(`/scheduled-events/${oneOff.id}/skip`, { occurrenceDate: ahead(2) }))
+        .status,
+    ).toBe(422);
+    expect(
+      (
+        await t.owner.post(`/scheduled-events/${oneOff.id}/split`, {
+          amount: peso(1_000),
+          startDate: ahead(6),
+        })
+      ).status,
+    ).toBe(422);
+    await t.owner.del(`/scheduled-events/${rent.id}`);
+    await t.owner.del(`/scheduled-events/${oneOff.id}`);
+  });
+
   it('salary projections respect contract end dates', async () => {
     const contract = await t.owner.post('/scheduled-events', {
       name: 'Client contract',
@@ -485,6 +583,35 @@ describe('budgets, goals & alerts', () => {
     expect(goals[0].currentAmount).toBe(peso(15_000));
     expect((await t.owner.get('/dashboard')).body.position.net).toBe(netBefore);
   });
+
+  it('only accepts an owned goal as the emergency fund and clears it when deleted', async () => {
+    const theirs = await t.partner.post('/goals', {
+      name: 'Partner fund',
+      kind: 'emergency',
+      targetAmount: peso(1_000),
+    });
+    expect((await t.owner.patch('/settings', { emergencyFundGoalId: theirs.body.id })).status).toBe(
+      422,
+    );
+    expect((await t.owner.patch('/settings', { emergencyFundGoalId: id() })).status).toBe(422);
+    await t.partner.del(`/goals/${theirs.body.id}`);
+
+    const mine = await t.owner.post('/goals', {
+      name: 'Rainy day',
+      kind: 'custom',
+      targetAmount: peso(5_000),
+    });
+    const set = await t.owner.patch('/settings', { emergencyFundGoalId: mine.body.id });
+    expect(set.status).toBe(200);
+    expect(set.body.emergencyFundGoalId).toBe(mine.body.id);
+    expect((await t.owner.del(`/goals/${mine.body.id}`)).status).toBe(204);
+    expect((await t.owner.get('/settings')).body.emergencyFundGoalId).toBeNull();
+  });
+
+  it('rejects an impossible budget month instead of failing', async () => {
+    expect((await t.owner.get('/budgets?month=2026-13')).status).toBe(400);
+    expect((await t.owner.get('/budgets?month=2026-02')).status).toBe(200);
+  });
 });
 
 describe('offline sync', () => {
@@ -547,6 +674,7 @@ describe('offline sync', () => {
     expect(pull.status).toBe(200);
     expect(pull.body.transactions.some((x: { id: string }) => x.id === txId)).toBe(true);
     expect(pull.body.accounts.length).toBe(3);
+    expect((await t.owner.get('/sync/pull?since=not-a-date')).status).toBe(400);
   });
 });
 
@@ -594,7 +722,24 @@ describe('demo mode', () => {
     const me = await t.owner.get('/me');
     expect(me.body.settings.features.calendar).toBe(false);
 
+    // Toggling a single feature keeps the others as they were (partial merge, not a reset).
+    const single = await t.owner.patch('/settings', { features: { goals: false } });
+    expect(single.body.features).toMatchObject({
+      calendar: false,
+      budgets: false,
+      goals: false,
+      forecast: true,
+    });
+    const again = await t.owner.patch('/settings', { features: { calendar: true } });
+    expect(again.body.features).toMatchObject({ calendar: true, budgets: false, goals: false });
+    // Unrelated settings changes leave features alone.
+    const buffer = await t.owner.patch('/settings', { safetyBuffer: peso(1_000) });
+    expect(buffer.body.features).toMatchObject({ budgets: false, goals: false });
+
     // Reset back
-    await t.owner.patch('/settings', { features: { calendar: true, budgets: true } });
+    await t.owner.patch('/settings', {
+      safetyBuffer: initial.body.safetyBuffer,
+      features: { calendar: true, budgets: true, goals: true },
+    });
   });
 });

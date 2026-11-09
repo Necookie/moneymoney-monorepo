@@ -1,4 +1,4 @@
-import { goalAllocations, goals } from '@mm/database';
+import { goalAllocations, goals, userSettings } from '@mm/database';
 import { projectGoal, todayInTimeZone } from '@mm/finance-engine';
 import {
   createGoal,
@@ -125,10 +125,23 @@ export const goalsRoutes: FastifyPluginAsyncZod = async (app) => {
     '/goals/:id',
     { schema: { tags, params: idParams, response: { 204: z.null() } } },
     async (request, reply) => {
-      const deleted = await app.db
-        .delete(goals)
-        .where(and(eq(goals.id, request.params.id), eq(goals.userId, request.auth.userId)))
-        .returning({ id: goals.id });
+      const { userId } = request.auth;
+      const deleted = await app.db.transaction(async (tx) => {
+        // Don't leave settings pointing at a goal that no longer exists.
+        await tx
+          .update(userSettings)
+          .set({ emergencyFundGoalId: null, updatedAt: new Date() })
+          .where(
+            and(
+              eq(userSettings.userId, userId),
+              eq(userSettings.emergencyFundGoalId, request.params.id),
+            ),
+          );
+        return tx
+          .delete(goals)
+          .where(and(eq(goals.id, request.params.id), eq(goals.userId, userId)))
+          .returning({ id: goals.id });
+      });
       if (!deleted.length) throw notFound('Goal');
       return reply.status(204).send(null);
     },
