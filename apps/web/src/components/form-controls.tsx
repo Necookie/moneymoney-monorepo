@@ -26,9 +26,11 @@ export function MoneyInput({
       </span>
       <input
         type="text"
-        inputMode="decimal"
+        // The decimal keypad has no minus key on iOS (and many Android keyboards), so fields that
+        // accept negatives get the full keyboard.
+        inputMode={allowNegative ? 'text' : 'decimal'}
         autoComplete="off"
-        placeholder={allowNegative ? '0.00 or −0.00' : '0.00'}
+        placeholder={allowNegative ? '0.00 or -0.00' : '0.00'}
         className={cn(inputClass, 'tabular pl-7')}
         {...props}
       />

@@ -131,6 +131,8 @@ export function OccurrenceDialogContent({
     const parsed = readMoney(paidAmount);
     if (!parsed.ok) return setError(parsed.error);
     if (!paidAccount) return setError('Choose the account the money moved through');
+    if (!paidOn) return setError('Choose the date the money moved');
+    if (paidOn > today) return setError("The payment date can't be in the future");
     setError(null);
     markPaid.mutate(parsed.value);
   }

@@ -76,6 +76,9 @@ function ImportFlow({ onClose }: { onClose: () => void }) {
   async function onFile(file: File | undefined) {
     setPreview(null);
     setFileError(null);
+    // Forget the previous file so a rejected pick can't silently re-check/import the old one.
+    setCsv(null);
+    setFileName('');
     if (!file) return;
     if (file.size > MAX_BYTES) {
       setFileError('File is larger than 5 MB.');

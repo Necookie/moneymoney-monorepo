@@ -39,8 +39,8 @@ import {
 import { FeatureDisabledState } from '@/components/feature-disabled-state';
 import {
   invalidatePlanning,
+  useFeatures,
   useLookups,
-  useMe,
   useOccurrences,
   usePlannerEvents,
   useToday,
@@ -58,7 +58,20 @@ type EditorState =
   | null;
 
 export function CalendarPage() {
-  const me = useMe();
+  // Gate in a wrapper so the page's hooks never run conditionally.
+  const features = useFeatures();
+  if (!features.calendar) {
+    return (
+      <FeatureDisabledState
+        featureName="Financial Calendar"
+        description="Enable Financial Calendar in Settings to plan upcoming bills, salaries, and recurring schedules."
+      />
+    );
+  }
+  return <CalendarContent />;
+}
+
+function CalendarContent() {
   const today = useToday();
   const params = useSearchParams();
   const router = useRouter();
@@ -72,15 +85,6 @@ export function CalendarPage() {
     return null;
   });
   const [selected, setSelected] = useState<OccurrenceDto | null>(null);
-
-  if (me.data?.settings.features.calendar === false) {
-    return (
-      <FeatureDisabledState
-        featureName="Financial Calendar"
-        description="Enable Financial Calendar in Settings to plan upcoming bills, salaries, and recurring schedules."
-      />
-    );
-  }
 
   const { from, to } = monthRange(month);
   const occurrences = useOccurrences(from, to);

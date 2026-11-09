@@ -11,7 +11,7 @@ import { FeatureDisabledState } from '@/components/feature-disabled-state';
 import { ErrorState, PageHeader } from '@/components/states';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge, Segmented, Skeleton, Switch } from '@/components/ui/misc';
-import { useMe } from '@/lib/queries';
+import { useFeatures, useMe } from '@/lib/queries';
 import { cn } from '@/lib/utils';
 import { useCashFlow } from '@/features/overview/use-cash-flow';
 import { AffordabilityCard } from './affordability';
@@ -35,6 +35,20 @@ const MODE_HELP: Record<ForecastMode, string> = {
 };
 
 export function ForecastPage() {
+  // Gate in a wrapper so no forecast requests are made while the feature is off.
+  const features = useFeatures();
+  if (!features.forecast) {
+    return (
+      <FeatureDisabledState
+        featureName="Forecast"
+        description="Enable Cash Flow Forecast in Settings to explore daily projections and scenarios."
+      />
+    );
+  }
+  return <ForecastContent showAffordability={features.afford} />;
+}
+
+function ForecastContent({ showAffordability }: { showAffordability: boolean }) {
   const [horizon, setHorizon] = useState<HorizonKey>('90');
   const [mode, setMode] = useState<ForecastMode>('expected');
   const [includeBudgets, setIncludeBudgets] = useState(true);
@@ -46,15 +60,6 @@ export function ForecastPage() {
     includeBudgetedSpending: includeBudgets,
   });
   const safetyBuffer = forecast?.safetyBuffer ?? me.data?.settings.safetyBuffer ?? 0;
-
-  if (me.data?.settings.features.forecast === false) {
-    return (
-      <FeatureDisabledState
-        featureName="Forecast"
-        description="Enable Cash Flow Forecast in Settings to explore daily projections and scenarios."
-      />
-    );
-  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -126,7 +131,7 @@ export function ForecastPage() {
         </div>
       )}
 
-      {me.data?.settings.features.afford !== false ? <AffordabilityCard /> : null}
+      {showAffordability ? <AffordabilityCard /> : null}
       <ScenarioCard horizonDays={horizonDays} mode={mode} />
     </div>
   );

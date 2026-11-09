@@ -3,12 +3,7 @@
 import { AndroidAppCard } from '@/features/android/android-app-card';
 import { SignOutButton, UserButton } from '@clerk/nextjs';
 import type { Category, Settings } from '@mm/api-client';
-import {
-  DEFAULT_APP_FEATURES,
-  type AppFeature,
-  type AppFeatures,
-  type CategoryKind,
-} from '@mm/types';
+import type { AppFeature, AppFeatures, CategoryKind } from '@mm/types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useState, type FormEvent } from 'react';
@@ -23,6 +18,7 @@ import { Field } from '@/components/ui/field';
 import { Input, NativeSelect } from '@/components/ui/input';
 import { Badge, Segmented, Switch } from '@/components/ui/misc';
 import { useApi } from '@/lib/api';
+import { resolveFeatures } from '@/lib/features';
 import { moneyToInput, readMoney } from '@/lib/format';
 import { invalidateKeys, qk, useCategories, useGoals, useMe } from '@/lib/queries';
 import { useCsvExport } from '@/features/transactions/csv-dialogs';
@@ -96,11 +92,18 @@ export function SettingsPage() {
         </Card>
       ) : (
         <div className="grid gap-4 lg:grid-cols-2">
-          <FeaturesCard
-            key={`features-${me.data.settings.updatedAt}`}
-            settings={me.data.settings}
-          />
-          <PreferencesCard key={me.data.settings.updatedAt} settings={me.data.settings} />
+          <div className="flex flex-col gap-4">
+            <FeaturesCard
+              key={`features-${me.data.settings.updatedAt}`}
+              settings={me.data.settings}
+            />
+            {/* Keyed on its own fields (not updatedAt) so toggling a feature doesn't remount the
+                form and wipe unsaved buffer/timezone edits. */}
+            <PreferencesCard
+              key={`${me.data.settings.safetyBuffer}|${me.data.settings.timezone}|${me.data.settings.emergencyFundGoalId ?? ''}`}
+              settings={me.data.settings}
+            />
+          </div>
           <div className="flex flex-col gap-4">
             <DemoCard demoMode={me.data.settings.demoMode} />
             <DataCard />
@@ -117,23 +120,15 @@ export function SettingsPage() {
 function FeaturesCard({ settings }: { settings: Settings }) {
   const api = useApi();
   const qc = useQueryClient();
-  const [features, setFeatures] = useState<AppFeatures>({
-    ...DEFAULT_APP_FEATURES,
-    ...(settings.features ?? {}),
-  });
+  const [features, setFeatures] = useState<AppFeatures>(() => resolveFeatures(settings.features));
 
   const save = useMutation({
     mutationFn: (next: Partial<AppFeatures>) => api.settings.update({ features: next }),
     onSuccess: () => {
       toast.success('Feature settings saved');
     },
-    onError: () => {
-      toast.error('Failed to update feature settings');
-      setFeatures({
-        ...DEFAULT_APP_FEATURES,
-        ...(settings.features ?? {}),
-      });
-    },
+    // The global mutation handler already shows the API error (with request id); just roll back.
+    onError: () => setFeatures(resolveFeatures(settings.features)),
     onSettled: () => invalidateKeys(qc, [qk.me, qk.dashboard]),
   });
 
@@ -164,6 +159,9 @@ function FeaturesCard({ settings }: { settings: Settings }) {
           {featureKeys.map((key) => {
             const meta = FEATURE_METADATA[key];
             const enabled = features[key];
+            // "Can I afford this?" lives on the Forecast page, so it is unreachable without it.
+            const blocked = key === 'afford' && !features.forecast;
+            const descId = `feature-desc-${key}`;
             return (
               <div
                 key={key}
@@ -171,13 +169,16 @@ function FeaturesCard({ settings }: { settings: Settings }) {
               >
                 <div className="flex flex-col gap-0.5">
                   <span className="text-[14px] font-medium text-ink">{meta.title}</span>
-                  <span className="text-[12px] text-muted">{meta.description}</span>
+                  <span id={descId} className="text-[12px] text-muted">
+                    {blocked ? 'Turn on Cash Flow Forecast to use this.' : meta.description}
+                  </span>
                 </div>
                 <Switch
-                  checked={enabled}
+                  checked={enabled && !blocked}
                   onCheckedChange={(checked) => onToggle(key, checked)}
-                  disabled={save.isPending}
-                  aria-label={`Toggle ${meta.title}`}
+                  disabled={save.isPending || blocked}
+                  aria-label={meta.title}
+                  aria-describedby={descId}
                 />
               </div>
             );

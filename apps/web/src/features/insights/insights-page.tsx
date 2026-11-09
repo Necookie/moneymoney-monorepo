@@ -32,8 +32,8 @@ import {
   useBudgets,
   useDashboard,
   useForecast,
+  useFeatures,
   useLookups,
-  useMe,
 } from '@/lib/queries';
 import { cn } from '@/lib/utils';
 
@@ -52,10 +52,8 @@ const SEVERITY_ORDER: Record<AlertSeverity, number> = { critical: 0, warning: 1,
 type AlertView = 'active' | 'dismissed' | 'resolved';
 
 export function InsightsPage() {
-  const me = useMe();
-  const dashboard = useDashboard();
-
-  if (me.data?.settings.features.insights === false) {
+  const features = useFeatures();
+  if (!features.insights) {
     return (
       <FeatureDisabledState
         featureName="Insights"
@@ -63,6 +61,11 @@ export function InsightsPage() {
       />
     );
   }
+  return <InsightsContent />;
+}
+
+function InsightsContent() {
+  const dashboard = useDashboard();
   return (
     <div className="flex flex-col gap-6">
       <PageHeader

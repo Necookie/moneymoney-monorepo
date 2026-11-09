@@ -20,6 +20,7 @@ import {
 } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { useApi } from './api';
+import { resolveFeatures } from './features';
 
 export type TransactionFilters = Omit<TransactionQuery, 'cursor' | 'limit'>;
 
@@ -85,6 +86,13 @@ export function invalidateKeys(qc: QueryClient, keys: ReadonlyArray<readonly unk
 export function useMe() {
   const api = useApi();
   return useQuery<Me>({ queryKey: qk.me, queryFn: () => api.me(), staleTime: 60_000 });
+}
+
+/** Feature toggles from Settings, with defaults filled in (everything on until /me loads). */
+export function useFeatures() {
+  const me = useMe();
+  const features = me.data?.settings.features;
+  return useMemo(() => resolveFeatures(features), [features]);
 }
 
 /** User's timezone (falls back to Asia/Manila until /me has loaded). */

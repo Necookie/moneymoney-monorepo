@@ -35,7 +35,7 @@ import { Badge, Skeleton, Switch } from '@/components/ui/misc';
 import { errorMessage, isApiError, useApi } from '@/lib/api';
 import { ACCOUNT_TYPE_LABEL, moneyToInput, readMoney } from '@/lib/format';
 import { FeatureDisabledState } from '@/components/feature-disabled-state';
-import { invalidateFinancial, useAccounts, useMe, useToday } from '@/lib/queries';
+import { invalidateFinancial, useAccounts, useFeatures, useToday } from '@/lib/queries';
 import { cn } from '@/lib/utils';
 
 const TYPE_ICON: Record<AccountType, IconName> = {
@@ -47,7 +47,22 @@ const TYPE_ICON: Record<AccountType, IconName> = {
 };
 
 export function AccountsPage() {
-  const me = useMe();
+  // Gate in a wrapper so the page's hooks never run conditionally (toggling the feature while
+  // this page is open — e.g. from the Android app, picked up on window focus — would otherwise
+  // change the hook order and crash the page).
+  const features = useFeatures();
+  if (!features.accounts) {
+    return (
+      <FeatureDisabledState
+        featureName="Accounts"
+        description="Enable Accounts in Settings to manage cash, bank, e-wallet, savings, and credit accounts."
+      />
+    );
+  }
+  return <AccountsContent />;
+}
+
+function AccountsContent() {
   const accounts = useAccounts();
   const params = useSearchParams();
   const router = useRouter();
@@ -58,15 +73,6 @@ export function AccountsPage() {
   const [deleting, setDeleting] = useState<Account | null>(null);
   const api = useApi();
   const qc = useQueryClient();
-
-  if (me.data?.settings.features.accounts === false) {
-    return (
-      <FeatureDisabledState
-        featureName="Accounts"
-        description="Enable Accounts in Settings to manage cash, bank, e-wallet, savings, and credit accounts."
-      />
-    );
-  }
 
   const closeEditor = () => {
     setEditing(null);

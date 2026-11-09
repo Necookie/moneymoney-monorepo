@@ -181,7 +181,9 @@ export function readMoney(
   input: string,
   options: { allowNegative?: boolean; allowZero?: boolean } = {},
 ): ParsedMoney {
-  const trimmed = input.trim();
+  // Accept the typographic minus our own formatMoney prints ("−₱1,234.00", also the input
+  // placeholder) and the en/em dashes some phone keyboards substitute for "-".
+  const trimmed = input.trim().replace(/^[−–—]/, '-');
   if (!trimmed) return { ok: false, error: 'Enter an amount' };
   let value: number;
   try {

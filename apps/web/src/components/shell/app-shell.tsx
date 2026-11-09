@@ -212,7 +212,7 @@ function MobileTabBar({
             </button>
           </DialogTrigger>
           <SheetContent title="Navigation">
-            <SidebarContents collapsed={false} />
+            <SidebarContents collapsed={false} onNavigate={() => onMoreOpenChange(false)} />
           </SheetContent>
         </Dialog>
       </div>
@@ -223,9 +223,12 @@ function MobileTabBar({
 function SidebarContents({
   collapsed,
   onToggleCollapsed,
+  onNavigate,
 }: {
   collapsed: boolean;
   onToggleCollapsed?: () => void;
+  /** Phone "More" sheet: close it when an item is chosen (even the current page). */
+  onNavigate?: () => void;
 }) {
   const pathname = usePathname();
   const { openCreate } = useTransactionDialog();
@@ -250,7 +253,10 @@ function SidebarContents({
         <Button
           variant="primary"
           className={cn('w-full', collapsed && 'px-0')}
-          onClick={() => openCreate()}
+          onClick={() => {
+            onNavigate?.();
+            openCreate();
+          }}
           aria-label="Add transaction"
           title="Add transaction (N)"
         >
@@ -275,6 +281,7 @@ function SidebarContents({
               <li key={item.href}>
                 <Link
                   href={item.href}
+                  onClick={onNavigate}
                   aria-current={active ? 'page' : undefined}
                   title={collapsed ? item.label : undefined}
                   className={cn(

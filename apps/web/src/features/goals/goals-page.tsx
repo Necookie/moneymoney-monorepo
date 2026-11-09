@@ -44,6 +44,7 @@ import {
   qk,
   useAccounts,
   useGoalAllocations,
+  useFeatures,
   useGoals,
   useMe,
   useToday,
@@ -53,6 +54,20 @@ import { cn } from '@/lib/utils';
 const GOAL_KEYS = [qk.goals, qk.dashboard, qk.alerts, qk.forecast];
 
 export function GoalsPage() {
+  // Gate in a wrapper so the page's hooks never run conditionally.
+  const features = useFeatures();
+  if (!features.goals) {
+    return (
+      <FeatureDisabledState
+        featureName="Goals"
+        description="Enable Goals in Settings to set savings targets and track emergency reserves."
+      />
+    );
+  }
+  return <GoalsContent />;
+}
+
+function GoalsContent() {
   const goals = useGoals();
   const me = useMe();
   const params = useSearchParams();
@@ -68,15 +83,6 @@ export function GoalsPage() {
   );
   const [history, setHistory] = useState<Goal | null>(null);
   const [deleting, setDeleting] = useState<Goal | null>(null);
-
-  if (me.data?.settings.features.goals === false) {
-    return (
-      <FeatureDisabledState
-        featureName="Goals"
-        description="Enable Goals in Settings to set savings targets and track emergency reserves."
-      />
-    );
-  }
 
   const archive = useMutation({
     mutationFn: (g: Goal) => api.goals.update(g.id, { archived: !g.archived }),

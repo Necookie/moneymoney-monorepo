@@ -1,6 +1,6 @@
 'use client';
 
-import type { Transaction, TransactionPage } from '@mm/api-client';
+import type { Account, Category, Transaction, TransactionPage } from '@mm/api-client';
 import type { TransactionType } from '@mm/types';
 import { formatMoney } from '@mm/finance-engine';
 import { useMutation, useQueryClient, type InfiniteData } from '@tanstack/react-query';
@@ -23,7 +23,8 @@ import { Input, Textarea } from '@/components/ui/input';
 import { Segmented } from '@/components/ui/misc';
 import { useApi } from '@/lib/api';
 import { moneyToInput, parseTags, readMoney, TRANSACTION_TYPE_LABEL } from '@/lib/format';
-import { invalidateFinancial, qk, useLookups, useToday } from '@/lib/queries';
+import { ErrorState, SkeletonRows } from '@/components/states';
+import { invalidateFinancial, qk, useAccounts, useLookups, useToday } from '@/lib/queries';
 import { newId } from '@/lib/utils';
 
 interface DialogState {
@@ -91,6 +92,11 @@ const TYPE_HINT: Record<TransactionType, string> = {
 
 type Errors = Partial<Record<'amount' | 'accountId' | 'counterAccountId' | 'occurredOn', string>>;
 
+/**
+ * Waits for accounts/categories before mounting the form, so the default account is preselected
+ * and "add your first account" is never shown just because the accounts list is still loading
+ * (e.g. tapping + right after opening the app on a phone).
+ */
 function TransactionForm({
   editing,
   defaults,
@@ -100,10 +106,102 @@ function TransactionForm({
   defaults?: DialogState['defaults'];
   onDone: () => void;
 }) {
+  const accountsQuery = useAccounts();
+  const { accounts, categories, isLoading } = useLookups();
+  const activeAccounts = accounts.filter((a) => !a.archived);
+  const title = editing ? 'Edit transaction' : 'Add transaction';
+
+  if (accountsQuery.isError) {
+    return (
+      <DialogContent title={title}>
+        <DialogBody>
+          <ErrorState
+            error={accountsQuery.error}
+            title="Couldn't load your accounts"
+            compact
+            onRetry={() => void accountsQuery.refetch()}
+          />
+        </DialogBody>
+      </DialogContent>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <DialogContent title={title}>
+        <DialogBody>
+          <SkeletonRows rows={3} />
+        </DialogBody>
+      </DialogContent>
+    );
+  }
+
+  if (accounts.length > 0 && activeAccounts.length === 0 && !editing) {
+    return (
+      <DialogContent title="Add transaction">
+        <DialogBody>
+          <p className="text-sm text-muted">
+            All accounts are archived. Unarchive or add an account first.
+          </p>
+        </DialogBody>
+        <DialogFooter>
+          <Button asChild variant="primary">
+            <Link href="/accounts" onClick={onDone}>
+              Go to accounts
+            </Link>
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    );
+  }
+
+  if (accounts.length === 0) {
+    return (
+      <DialogContent title="Add transaction" description="Transactions belong to an account.">
+        <DialogBody>
+          <p className="text-sm text-muted">
+            Add your first account (cash, bank, e-wallet, savings or credit card) before recording
+            transactions.
+          </p>
+        </DialogBody>
+        <DialogFooter>
+          <Button asChild variant="primary">
+            <Link href="/accounts?new=1" onClick={onDone}>
+              Add an account
+            </Link>
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    );
+  }
+
+  return (
+    <TransactionFormBody
+      editing={editing}
+      defaults={defaults}
+      onDone={onDone}
+      accounts={accounts}
+      categories={categories}
+    />
+  );
+}
+
+function TransactionFormBody({
+  editing,
+  defaults,
+  onDone,
+  accounts,
+  categories,
+}: {
+  editing: Transaction | null;
+  defaults?: DialogState['defaults'];
+  onDone: () => void;
+  accounts: Account[];
+  categories: Category[];
+}) {
   const api = useApi();
   const qc = useQueryClient();
   const today = useToday();
-  const { accounts, categories } = useLookups();
   const activeAccounts = accounts.filter((a) => !a.archived);
 
   const [type, setType] = useState<TransactionType>(editing?.type ?? defaults?.type ?? 'expense');
@@ -192,6 +290,10 @@ function TransactionForm({
         next.counterAccountId = 'Pick a different account than the source';
     }
     if (!occurredOn) next.occurredOn = 'Choose a date';
+    // Actual ≠ projected: future money belongs in the planner (the picker's `max` is only a hint
+    // and typed dates bypass it). Existing future-dated rows can still be edited as-is.
+    else if (occurredOn > today && occurredOn !== editing?.occurredOn)
+      next.occurredOn = "Can't be in the future — plan it in the Financial Calendar instead";
     setErrors(next);
     if (Object.keys(next).length > 0 || !parsed.ok) return;
 
@@ -207,45 +309,6 @@ function TransactionForm({
       notes: notes.trim() ? notes.trim() : null,
       tags: parseTags(tags),
     });
-  }
-
-  if (accounts.length > 0 && activeAccounts.length === 0 && !editing) {
-    return (
-      <DialogContent title="Add transaction">
-        <DialogBody>
-          <p className="text-sm text-muted">
-            All accounts are archived. Unarchive or add an account first.
-          </p>
-        </DialogBody>
-        <DialogFooter>
-          <Button asChild variant="primary">
-            <Link href="/accounts" onClick={onDone}>
-              Go to accounts
-            </Link>
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    );
-  }
-
-  if (accounts.length === 0) {
-    return (
-      <DialogContent title="Add transaction" description="Transactions belong to an account.">
-        <DialogBody>
-          <p className="text-sm text-muted">
-            Add your first account (cash, bank, e-wallet, savings or credit card) before recording
-            transactions.
-          </p>
-        </DialogBody>
-        <DialogFooter>
-          <Button asChild variant="primary">
-            <Link href="/accounts?new=1" onClick={onDone}>
-              Add an account
-            </Link>
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    );
   }
 
   return (

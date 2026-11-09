@@ -25,6 +25,15 @@ describe('readMoney', () => {
     assert.equal(readMoney('-5').ok, false);
     assert.equal(readMoney('0').ok, false);
   });
+  it('accepts the typographic minus and dashes phone keyboards insert', () => {
+    assert.deepEqual(readMoney('−₱1,234.00', { allowNegative: true }), {
+      ok: true,
+      value: -123400,
+    });
+    assert.deepEqual(readMoney('–5', { allowNegative: true }), { ok: true, value: -500 });
+    assert.deepEqual(readMoney(' —0.50', { allowNegative: true }), { ok: true, value: -50 });
+    assert.equal(readMoney('−5').ok, false);
+  });
   it('allows negatives and zero when asked', () => {
     assert.deepEqual(readMoney('-5', { allowNegative: true }), { ok: true, value: -500 });
     assert.deepEqual(readMoney('0', { allowZero: true }), { ok: true, value: 0 });
