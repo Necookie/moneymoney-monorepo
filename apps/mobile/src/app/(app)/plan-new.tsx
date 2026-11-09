@@ -6,9 +6,9 @@ import { useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AccountChips, CategoryChips, DateField } from '@/components/pickers';
-import { FeatureDisabledScreen } from '@/components/FeatureDisabled';
+import { FeatureGate } from '@/components/FeatureDisabled';
 import { Button, Chip, Field, IconButton, Label, Row, Segmented, Text } from '@/components/ui';
-import { useLocalAccounts, useLocalCategories, useLocalSettings } from '@/hooks/useLocalData';
+import { useLocalAccounts, useLocalCategories } from '@/hooks/useLocalData';
 import { errorMessage, getApi } from '@/lib/api';
 import { today, tryParseMoney } from '@/lib/format';
 import { syncNow } from '@/lib/sync/runtime';
@@ -41,21 +41,24 @@ function dayNumber(input: string): number | null {
 
 /** Add a planned item: one-off or recurring; salary twice a month; contracts with an end date. */
 export default function NewPlannedItemScreen() {
-  const settings = useLocalSettings();
+  return (
+    <FeatureGate
+      feature="calendar"
+      title="Plan item"
+      featureName="Financial Calendar"
+      description="Enable Financial Calendar in Settings to plan upcoming bills, salaries, and recurring schedules."
+    >
+      <NewPlannedItemContent />
+    </FeatureGate>
+  );
+}
+
+function NewPlannedItemContent() {
   const qc = useQueryClient();
   const accounts = useLocalAccounts();
   const categories = useLocalCategories();
   const [direction, setDirection] = useState<'outflow' | 'inflow'>('outflow');
 
-  if (settings.data?.features?.calendar === false) {
-    return (
-      <FeatureDisabledScreen
-        title="Plan item"
-        featureName="Financial Calendar"
-        description="Enable Financial Calendar in Settings to plan upcoming bills, salaries, and recurring schedules."
-      />
-    );
-  }
   const [kind, setKind] = useState<EventKind>('bill');
   const [name, setName] = useState('');
   const [amount, setAmount] = useState('');

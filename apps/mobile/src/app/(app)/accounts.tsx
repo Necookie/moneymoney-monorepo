@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { View } from 'react-native';
 import { DateField } from '@/components/pickers';
 import { Screen } from '@/components/Screen';
-import { FeatureDisabledScreen } from '@/components/FeatureDisabled';
+import { FeatureGate } from '@/components/FeatureDisabled';
 import {
   Button,
   Card,
@@ -19,7 +19,7 @@ import {
   Sheet,
   Text,
 } from '@/components/ui';
-import { useLocalAccounts, useLocalSettings } from '@/hooks/useLocalData';
+import { useLocalAccounts } from '@/hooks/useLocalData';
 import { errorMessage, getApi } from '@/lib/api';
 import { formatMoney, timeAgo, today, tryParseMoney } from '@/lib/format';
 import { syncNow, useSyncStatus } from '@/lib/sync/runtime';
@@ -117,7 +117,19 @@ function NewAccountSheet({ visible, onClose }: { visible: boolean; onClose: () =
 }
 
 export default function AccountsScreen() {
-  const settings = useLocalSettings();
+  return (
+    <FeatureGate
+      feature="accounts"
+      title="Accounts"
+      featureName="Accounts"
+      description="Enable Accounts in Settings to view balances and manage accounts."
+    >
+      <AccountsContent />
+    </FeatureGate>
+  );
+}
+
+function AccountsContent() {
   const local = useLocalAccounts();
   const status = useSyncStatus();
   const [creating, setCreating] = useState(false);
@@ -126,15 +138,6 @@ export default function AccountsScreen() {
   const open = accounts.filter((a) => !a.archived);
   const archived = accounts.filter((a) => a.archived);
 
-  if (settings.data?.features?.accounts === false) {
-    return (
-      <FeatureDisabledScreen
-        title="Accounts"
-        featureName="Accounts"
-        description="Enable Accounts in Settings to view balances and manage accounts."
-      />
-    );
-  }
   let assets = 0;
   let liabilities = 0;
   for (const a of accounts) {

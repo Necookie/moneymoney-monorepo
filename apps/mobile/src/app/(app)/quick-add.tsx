@@ -7,18 +7,11 @@ import { Keypad } from '@/components/Keypad';
 import { AccountChips, CategoryChips, DateField } from '@/components/pickers';
 import { Button, Field, IconButton, Label, Row, Segmented, Text } from '@/components/ui';
 import { useLocalAccounts, useLocalCategories } from '@/hooks/useLocalData';
+import { centavosToInput, formatAmountInput } from '@/lib/amountInput';
 import { formatMoney, today, tryParseMoney } from '@/lib/format';
 import { addTransaction, editTransaction, getSyncRuntime } from '@/lib/sync/runtime';
 
 const LAST_ACCOUNT = 'lastAccountId';
-
-/** Plain decimal string for the keypad from centavos ("1234.5" style, no grouping). */
-function toInput(amount: number): string {
-  const abs = Math.abs(amount);
-  const whole = Math.floor(abs / 100);
-  const cents = abs % 100;
-  return cents ? `${whole}.${String(cents).padStart(2, '0').replace(/0$/, '')}` : String(whole);
-}
 
 /**
  * Fast entry: keypad first, works fully offline. Saving writes to SQLite and queues the change
@@ -39,6 +32,8 @@ export default function QuickAddScreen() {
   const [description, setDescription] = useState('');
   const [notes, setNotes] = useState('');
   const [showNote, setShowNote] = useState(false);
+  // Not editable here, but kept so saving an edit doesn't wipe tags set on the web.
+  const [tags, setTags] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loaded, setLoaded] = useState(!editing);
@@ -57,7 +52,7 @@ export default function QuickAddScreen() {
           return;
         }
         setType(tx.type);
-        setAmount(toInput(tx.amount));
+        setAmount(centavosToInput(tx.amount));
         setAccountId(tx.accountId);
         setCounterAccountId(tx.counterAccountId);
         setCategoryId(tx.categoryId);
@@ -65,6 +60,7 @@ export default function QuickAddScreen() {
         setDescription(tx.description);
         setNotes(tx.notes ?? '');
         setShowNote(!!tx.notes);
+        setTags(tx.tags);
         setLoaded(true);
       } else {
         const last = await storage.getMeta(LAST_ACCOUNT);
@@ -78,12 +74,16 @@ export default function QuickAddScreen() {
 
   const accountList = useMemo(() => accounts.data?.accounts ?? [], [accounts.data]);
   useEffect(() => {
-    // Fall back to the first open account if none is chosen / the remembered one is gone.
+    // Fall back to the first open account if none is chosen / the remembered one is gone or was
+    // archived (archived accounts aren't offered as chips, so it would be an invisible choice).
+    // An edit keeps the row's own account even if archived.
     if (!loaded || !accountList.length) return;
-    if (!accountId || !accountList.some((a) => a.id === accountId)) {
+    const usable = (a: (typeof accountList)[number]) =>
+      a.id === accountId && (editing || !a.archived);
+    if (!accountId || !accountList.some(usable)) {
       setAccountId(accountList.find((a) => !a.archived)?.id ?? null);
     }
-  }, [accountList, accountId, loaded]);
+  }, [accountList, accountId, loaded, editing]);
 
   const centavos = tryParseMoney(amount);
   const typeOptions = useMemo(() => {
@@ -113,7 +113,7 @@ export default function QuickAddScreen() {
       occurredOn: date,
       description: description.trim(),
       notes: notes.trim() ? notes.trim() : null,
-      tags: [],
+      tags,
     };
     setSaving(true);
     try {
@@ -152,8 +152,7 @@ export default function QuickAddScreen() {
             numberOfLines={1}
             accessibilityLabel={`Amount ${centavos ? formatMoney(centavos) : 'empty'}`}
           >
-            {centavos !== null ? formatMoney(centavos) : '₱0'}
-            {amount.endsWith('.') ? '.' : ''}
+            {formatAmountInput(amount)}
           </Text>
         </View>
 

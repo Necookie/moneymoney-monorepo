@@ -5,9 +5,9 @@ import { View } from 'react-native';
 import { Icon, type IconName } from '@/components/Icon';
 import { AccountChips, DateField } from '@/components/pickers';
 import { Screen } from '@/components/Screen';
-import { FeatureDisabledScreen } from '@/components/FeatureDisabled';
+import { FeatureGate } from '@/components/FeatureDisabled';
 import { Button, Card, Divider, Field, Label, Money, Row, Text } from '@/components/ui';
-import { useLocalAccounts, useLocalSettings } from '@/hooks/useLocalData';
+import { useLocalAccounts } from '@/hooks/useLocalData';
 import { errorMessage, getApi } from '@/lib/api';
 import { formatDate, formatMoney, today, tryParseMoney } from '@/lib/format';
 import { colors } from '@/lib/theme';
@@ -52,23 +52,25 @@ function Check({ ok, label }: { ok: boolean; label: string }) {
 
 /** Review-before-commit verdict: affordable today vs. without compromising obligations. */
 export default function AffordScreen() {
-  const settings = useLocalSettings();
+  return (
+    <FeatureGate
+      feature="afford"
+      title="Can I afford this?"
+      featureName="Can I afford this?"
+      description="Enable this feature in Settings to test purchases against upcoming obligations."
+    >
+      <AffordContent />
+    </FeatureGate>
+  );
+}
+
+function AffordContent() {
   const accounts = useLocalAccounts();
   const [name, setName] = useState('');
   const [amount, setAmount] = useState('');
   const [date, setDate] = useState(today());
   const [accountId, setAccountId] = useState<string | null>(null);
   const [installments, setInstallments] = useState('');
-
-  if (settings.data?.features?.afford === false) {
-    return (
-      <FeatureDisabledScreen
-        title="Can I afford this?"
-        featureName="Can I afford this?"
-        description="Enable this feature in Settings to test purchases against upcoming obligations."
-      />
-    );
-  }
 
   const check = useMutation<AffordabilityResponse, Error>({
     mutationFn: () => {

@@ -9,18 +9,19 @@ import { Inter_400Regular } from '@expo-google-fonts/inter/400Regular';
 import { Inter_500Medium } from '@expo-google-fonts/inter/500Medium';
 import { Inter_600SemiBold } from '@expo-google-fonts/inter/600SemiBold';
 import { Inter_700Bold } from '@expo-google-fonts/inter/700Bold';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClient, QueryClientProvider, useQueryClient } from '@tanstack/react-query';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Text } from '@/components/ui';
 import { isOfflineError } from '@/lib/api';
 import { config, isConfigured } from '@/lib/config';
+import { claimLocalData } from '@/lib/session';
 import { getSyncRuntime } from '@/lib/sync/runtime';
 import { colors } from '@/lib/theme';
 
@@ -42,9 +43,14 @@ const queryClient = new QueryClient({
 const SESSION_HINT = 'hadSession';
 
 function RootNavigator() {
-  const { isLoaded, isSignedIn } = useAuth();
+  const { isLoaded, isSignedIn, userId } = useAuth();
+  const queryClient = useQueryClient();
   const [hint, setHint] = useState<boolean | null>(null);
   const [waited, setWaited] = useState(false);
+  /** Signed-in user whose ownership of the local database has been checked. */
+  const [claimedBy, setClaimedBy] = useState<string | null>(null);
+  const shown = useRef(false);
+  const appShown = useRef(false);
 
   useEffect(() => {
     getSyncRuntime()
@@ -58,18 +64,38 @@ function RootNavigator() {
 
   useEffect(() => {
     if (!isLoaded) return;
-    getSyncRuntime()
-      .then((rt) => rt.storage.setMeta(SESSION_HINT, isSignedIn ? '1' : null))
-      .catch(() => undefined);
-  }, [isLoaded, isSignedIn]);
+    let cancelled = false;
+    (async () => {
+      // Another account's leftovers (e.g. an expired session never signed out) must be wiped
+      // before the app shows or syncs anything.
+      if (isSignedIn && userId) await claimLocalData(userId, queryClient).catch(() => false);
+      const rt = await getSyncRuntime();
+      await rt.storage.setMeta(SESSION_HINT, isSignedIn ? '1' : null);
+    })()
+      .catch(() => undefined)
+      .finally(() => {
+        if (!cancelled) setClaimedBy(isSignedIn && userId ? userId : null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [isLoaded, isSignedIn, userId, queryClient]);
 
   const offlineSignedIn = !isLoaded && waited && hint === true;
-  const decided = isLoaded || offlineSignedIn || (waited && hint === false);
-  const signedIn = isLoaded ? !!isSignedIn : offlineSignedIn;
+  // While the ownership check runs, keep whatever is on screen: the app tree if it was already
+  // open offline (same cached session), the sign-in screen right after signing in, or the
+  // splash on a cold start.
+  const claiming = isLoaded && !!isSignedIn && claimedBy !== userId;
+  const decided = isLoaded
+    ? !claiming || shown.current
+    : offlineSignedIn || (waited && hint === false);
+  const signedIn = isLoaded ? !!isSignedIn && (!claiming || appShown.current) : offlineSignedIn;
 
   useEffect(() => {
     if (decided) SplashScreen.hideAsync().catch(() => undefined);
-  }, [decided]);
+    if (decided) shown.current = true;
+    appShown.current = decided && signedIn;
+  }, [decided, signedIn]);
 
   if (!decided) return <View className="flex-1 bg-ink" />;
 

@@ -22,9 +22,8 @@ import {
   Skeleton,
   Text,
 } from '@/components/ui';
-import { FeatureDisabledScreen } from '@/components/FeatureDisabled';
+import { FeatureGate } from '@/components/FeatureDisabled';
 import { useCachedQuery } from '@/hooks/useCachedQuery';
-import { useLocalSettings } from '@/hooks/useLocalData';
 import { errorMessage, getApi } from '@/lib/api';
 import { formatDate, formatMoney, percent, today, tryParseMoney } from '@/lib/format';
 
@@ -181,21 +180,23 @@ function NewGoalSheet({ visible, onClose }: { visible: boolean; onClose: () => v
 }
 
 export default function GoalsScreen() {
-  const settings = useLocalSettings();
+  return (
+    <FeatureGate
+      feature="goals"
+      title="Goals"
+      featureName="Goals"
+      description="Enable Goals in Settings to set savings targets and track emergency reserves."
+    >
+      <GoalsContent />
+    </FeatureGate>
+  );
+}
+
+function GoalsContent() {
   const goals = useCachedQuery(['goals'], () => getApi().goals.list());
   const [active, setActive] = useState<Goal | null>(null);
   const [creating, setCreating] = useState(false);
   const list = (goals.data?.data ?? []).filter((g) => !g.archived);
-
-  if (settings.data?.features?.goals === false) {
-    return (
-      <FeatureDisabledScreen
-        title="Goals"
-        featureName="Goals"
-        description="Enable Goals in Settings to set savings targets and track emergency reserves."
-      />
-    );
-  }
 
   return (
     <Screen title="Goals" back refreshing={goals.isRefetching} onRefresh={() => goals.refetch()}>

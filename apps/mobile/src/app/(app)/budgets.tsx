@@ -21,9 +21,9 @@ import {
   Skeleton,
   Text,
 } from '@/components/ui';
-import { FeatureDisabledScreen } from '@/components/FeatureDisabled';
+import { FeatureGate } from '@/components/FeatureDisabled';
 import { useCachedQuery } from '@/hooks/useCachedQuery';
-import { useLocalCategories, useLocalSettings } from '@/hooks/useLocalData';
+import { useLocalCategories } from '@/hooks/useLocalData';
 import { errorMessage, getApi } from '@/lib/api';
 import { formatMoney, percent, tryParseMoney } from '@/lib/format';
 
@@ -35,7 +35,19 @@ const STATE = {
 } as const;
 
 export default function BudgetsScreen() {
-  const settings = useLocalSettings();
+  return (
+    <FeatureGate
+      feature="budgets"
+      title="Budgets"
+      featureName="Budgets"
+      description="Enable Budgets in Settings to set monthly limits and monitor spending pace."
+    >
+      <BudgetsContent />
+    </FeatureGate>
+  );
+}
+
+function BudgetsContent() {
   const api = getApi();
   const qc = useQueryClient();
   const budgets = useCachedQuery(['budgets'], () => api.budgets.list());
@@ -43,16 +55,6 @@ export default function BudgetsScreen() {
   const [editing, setEditing] = useState<Budget | 'new' | null>(null);
   const [categoryId, setCategoryId] = useState<string | null>(null);
   const [amount, setAmount] = useState('');
-
-  if (settings.data?.features?.budgets === false) {
-    return (
-      <FeatureDisabledScreen
-        title="Budgets"
-        featureName="Budgets"
-        description="Enable Budgets in Settings to set monthly limits and monitor spending pace."
-      />
-    );
-  }
 
   const save = useMutation({
     mutationFn: async () => {

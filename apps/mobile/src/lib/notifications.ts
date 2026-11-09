@@ -3,6 +3,7 @@ import { formatDate, formatMoney } from '@mm/finance-engine';
 import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
 import type { SqliteStorage } from './db/sqliteStorage';
+import { createMutex } from './sync/mutex';
 
 /**
  * Local notifications only (no remote push):
@@ -18,6 +19,12 @@ const NOTIFIED_ALERTS_KEY = 'notifiedCriticalAlerts';
 const MAX_SCHEDULED = 60;
 /** Asia/Manila is UTC+8 all year (no DST). */
 const MANILA_OFFSET_HOURS = 8;
+
+/**
+ * Scheduling diffs against the `scheduled_notifications` table, so two overlapping runs (a sync
+ * finishing while reminders are switched on) would both schedule the same reminder. Serialise.
+ */
+const scheduling = createMutex();
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -62,7 +69,7 @@ export async function isEnabled(storage: SqliteStorage): Promise<boolean> {
 
 export async function setEnabled(storage: SqliteStorage, enabled: boolean): Promise<void> {
   await storage.setMeta(ENABLED_KEY, enabled ? '1' : null);
-  if (!enabled) await cancelAllReminders(storage);
+  if (!enabled) await scheduling(() => cancelAllReminders(storage));
 }
 
 /** Epoch ms for 09:00 Manila time on the day before `date` (YYYY-MM-DD). */
@@ -87,10 +94,18 @@ async function cancelAllReminders(storage: SqliteStorage) {
 }
 
 /** Diff desired reminders against what is scheduled; only touch what changed. */
-export async function rescheduleBillReminders(
+export function rescheduleBillReminders(
   storage: SqliteStorage,
   upcoming: OccurrenceDto[],
   now = Date.now(),
+): Promise<void> {
+  return scheduling(() => reschedule(storage, upcoming, now));
+}
+
+async function reschedule(
+  storage: SqliteStorage,
+  upcoming: OccurrenceDto[],
+  now: number,
 ): Promise<void> {
   if (!(await isEnabled(storage)) || (await getPermission()) !== 'granted') return;
   await ensureChannels();
@@ -141,10 +156,11 @@ export async function rescheduleBillReminders(
 }
 
 /** Notify once per critical alert id. */
-export async function notifyNewCriticalAlerts(
-  storage: SqliteStorage,
-  alerts: Alert[],
-): Promise<void> {
+export function notifyNewCriticalAlerts(storage: SqliteStorage, alerts: Alert[]): Promise<void> {
+  return scheduling(() => notifyAlerts(storage, alerts));
+}
+
+async function notifyAlerts(storage: SqliteStorage, alerts: Alert[]): Promise<void> {
   if (!(await isEnabled(storage)) || (await getPermission()) !== 'granted') return;
   const seen = new Set<string>(JSON.parse((await storage.getMeta(NOTIFIED_ALERTS_KEY)) ?? '[]'));
   const critical = alerts.filter((a) => a.severity === 'critical' && a.status === 'active');

@@ -1,4 +1,5 @@
 import { useClerk } from '@clerk/expo';
+import type { Settings } from '@mm/api-client';
 import { toDecimalString } from '@mm/finance-engine';
 import { DEFAULT_APP_FEATURES, type AppFeature, type AppFeatures } from '@mm/types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -24,7 +25,16 @@ import {
 import { formatMoney, timeAgo, tryParseMoney } from '@/lib/format';
 import * as Notif from '@/lib/notifications';
 import { signOutEverywhere } from '@/lib/session';
+import { bumpLocalData } from '@/lib/events';
 import { getSyncRuntime, syncNow, useSyncStatus } from '@/lib/sync/runtime';
+import { META } from '@/lib/sync/types';
+
+/** Store settings the API just returned, as a pull would, and refresh local readers. */
+async function saveLocalSettings(saved: Settings): Promise<void> {
+  const { storage } = await getSyncRuntime();
+  await storage.setMeta(META.settings, JSON.stringify(saved));
+  bumpLocalData();
+}
 
 const FEATURE_KEYS: AppFeature[] = [
   'calendar',
@@ -112,18 +122,24 @@ export default function SettingsScreen() {
     ...(settings.data?.features ?? {}),
   }));
 
+  // Local reads return a fresh object on every sync/mutation; key on the content so an
+  // optimistic toggle isn't reset by an unrelated refresh.
+  const serverFeatures = settings.data?.features ? JSON.stringify(settings.data.features) : null;
   useEffect(() => {
-    if (settings.data?.features) {
-      setLocalFeatures({ ...DEFAULT_APP_FEATURES, ...settings.data.features });
+    if (serverFeatures) {
+      setLocalFeatures({ ...DEFAULT_APP_FEATURES, ...(JSON.parse(serverFeatures) as AppFeatures) });
     }
-  }, [settings.data?.features]);
+  }, [serverFeatures]);
 
   const toggleFeature = async (feature: AppFeature, next: boolean) => {
     const previous = localFeatures;
     const updated = { ...localFeatures, [feature]: next };
     setLocalFeatures(updated);
     try {
-      await getApi().settings.update({ features: { [feature]: next } });
+      const saved = await getApi().settings.update({ features: updated });
+      // Apply locally right away: tabs, More and gated screens read the pulled settings, and a
+      // sync that was already running may have pulled before this change.
+      await saveLocalSettings(saved);
       await syncNow({ force: true }).catch(() => undefined);
       await qc.invalidateQueries();
     } catch (err) {
@@ -148,9 +164,12 @@ export default function SettingsScreen() {
     })().catch(() => undefined);
   }, []);
 
+  // Only when the saved value changes — not on every local refresh, which would wipe what the
+  // user is typing.
+  const savedBuffer = settings.data?.safetyBuffer;
   useEffect(() => {
-    if (settings.data) setBuffer(toDecimalString(settings.data.safetyBuffer));
-  }, [settings.data]);
+    if (savedBuffer !== undefined) setBuffer(toDecimalString(savedBuffer));
+  }, [savedBuffer]);
 
   const toggleLock = async (next: boolean) => {
     if (next) {
@@ -187,7 +206,8 @@ export default function SettingsScreen() {
       if (value === null || value < 0) throw new Error('Enter a valid amount (0 or more).');
       return getApi().settings.update({ safetyBuffer: value });
     },
-    onSuccess: async () => {
+    onSuccess: async (saved) => {
+      await saveLocalSettings(saved);
       await syncNow({ force: true }).catch(() => undefined);
       await qc.invalidateQueries();
     },
@@ -197,6 +217,10 @@ export default function SettingsScreen() {
     mutationFn: async (action: 'load' | 'clear') =>
       action === 'load' ? getApi().demo.load() : getApi().demo.clear(),
     onSuccess: async () => {
+      // Clearing demo data hard-deletes rows (no tombstones), so an incremental pull would
+      // never remove them locally. Force a full snapshot, which drops rows the server lost.
+      const { storage } = await getSyncRuntime();
+      await storage.setMeta(META.lastPulledAt, null);
       await syncNow({ force: true }).catch(() => undefined);
       await qc.invalidateQueries();
     },

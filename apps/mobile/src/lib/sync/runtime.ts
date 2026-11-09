@@ -122,15 +122,46 @@ export async function refreshSyncStatus(): Promise<void> {
   });
 }
 
-/** Run a sync now (single-flight: joins a run already in progress). */
-export async function syncNow(options: SyncRunOptions = {}): Promise<SyncResult> {
+let currentRun: Promise<SyncResult> | null = null;
+/** Set while signing out: no sync may write the previous user's data back into SQLite. */
+let paused = false;
+
+const SKIPPED: SyncResult = {
+  ok: false,
+  applied: 0,
+  duplicates: 0,
+  conflicts: 0,
+  rejected: 0,
+  remaining: 0,
+  pulled: false,
+  error: null,
+};
+
+/**
+ * Run a sync now (single-flight: joins a run already in progress). After-sync hooks run once
+ * per run, not once per caller — otherwise concurrent callers (pull-to-refresh during a
+ * periodic sync) would schedule the same reminders and alert notifications twice.
+ */
+export function syncNow(options: SyncRunOptions = {}): Promise<SyncResult> {
+  if (paused) return Promise.resolve({ ...SKIPPED });
+  if (!currentRun) {
+    currentRun = runSync(options).finally(() => {
+      currentRun = null;
+    });
+  }
+  return currentRun;
+}
+
+async function runSync(options: SyncRunOptions): Promise<SyncResult> {
   const rt = await getSyncRuntime();
+  if (paused) return { ...SKIPPED };
   setStatus({ running: true });
   try {
     const result = await rt.engine.sync(options);
     if (result.error?.kind === 'offline') setStatus({ online: false });
     else if (result.pulled) setStatus({ online: true });
     for (const hook of afterSyncHooks) {
+      if (paused) break;
       try {
         await hook(result, rt.storage);
       } catch (err) {
@@ -143,6 +174,16 @@ export async function syncNow(options: SyncRunOptions = {}): Promise<SyncResult>
     await refreshSyncStatus().catch(() => undefined);
     setStatus({ running: false });
   }
+}
+
+/** True while local data is being wiped (sign-out); caches must not be written meanwhile. */
+export function isSyncPaused(): boolean {
+  return paused;
+}
+
+/** Allow syncing again (a signed-in app tree mounted, or sign-out was abandoned). */
+export function resumeSync(): void {
+  paused = false;
 }
 
 let debounce: ReturnType<typeof setTimeout> | null = null;
@@ -208,6 +249,7 @@ const PERIODIC_MS = 2 * 60_000;
 
 /** Start foreground sync triggers. Returns a stop function. */
 export function startSyncTriggers(): () => void {
+  resumeSync();
   let lastState: AppStateStatus | string | null | undefined = AppState.currentState;
   const appSub = AppState.addEventListener('change', (next) => {
     if (lastState !== 'active' && next === 'active') requestSync(0);
@@ -236,8 +278,18 @@ export function startSyncTriggers(): () => void {
   };
 }
 
-/** Forget everything local (sign-out). */
+/**
+ * Forget everything local (sign-out). Pauses sync first and waits for a run in flight, so a
+ * pull that was already on the wire cannot refill the wiped tables with the old account's
+ * data. Sync stays paused until `resumeSync()` (the next signed-in session).
+ */
 export async function resetLocalData(): Promise<void> {
+  paused = true;
+  if (debounce) {
+    clearTimeout(debounce);
+    debounce = null;
+  }
+  await currentRun?.catch(() => undefined);
   const { storage } = await getSyncRuntime();
   await storage.clearAll();
   bumpLocalData();

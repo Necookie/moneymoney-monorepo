@@ -1,6 +1,6 @@
 import { useQuery, type QueryKey } from '@tanstack/react-query';
 import { isOfflineError } from '@/lib/api';
-import { getSyncRuntime } from '@/lib/sync/runtime';
+import { getSyncRuntime, isSyncPaused } from '@/lib/sync/runtime';
 
 export interface Cached<T> {
   data: T;
@@ -24,7 +24,8 @@ export function useCachedQuery<T>(key: QueryKey, fetcher: () => Promise<T>, enab
       try {
         const data = await fetcher();
         const fetchedAt = Date.now();
-        await storage.setCache(cacheKey, data, fetchedAt);
+        // A response landing mid sign-out must not be saved for the next session to show.
+        if (!isSyncPaused()) await storage.setCache(cacheKey, data, fetchedAt);
         return { data, fetchedAt, fromCache: false };
       } catch (err) {
         if (isOfflineError(err)) {

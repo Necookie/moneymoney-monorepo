@@ -135,7 +135,11 @@ export default function AppLayout() {
   useEffect(
     () =>
       onAfterSync((result) => {
-        if (result.pulled) queryClient.invalidateQueries().catch(() => undefined);
+        // The update check keeps its own 6-hour schedule; don't re-fetch it on every pull.
+        if (result.pulled)
+          queryClient
+            .invalidateQueries({ predicate: (q) => q.queryKey[0] !== 'android-update' })
+            .catch(() => undefined);
       }),
     [queryClient],
   );

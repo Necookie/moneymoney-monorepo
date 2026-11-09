@@ -32,9 +32,9 @@ import {
   Skeleton,
   Text,
 } from '@/components/ui';
-import { FeatureDisabledScreen } from '@/components/FeatureDisabled';
+import { FeatureGate } from '@/components/FeatureDisabled';
 import { useCachedQuery } from '@/hooks/useCachedQuery';
-import { useLocalAccounts, useLocalSettings, useLocalUpcoming } from '@/hooks/useLocalData';
+import { useLocalAccounts, useLocalUpcoming } from '@/hooks/useLocalData';
 import { errorMessage, getApi } from '@/lib/api';
 import { formatMoney, relativeDay, today, tryParseMoney } from '@/lib/format';
 import * as Notif from '@/lib/notifications';
@@ -160,6 +160,9 @@ function OccurrenceSheet({ o, onClose }: { o: OccurrenceDto | null; onClose: () 
   const [month, setMonth] = useState(today());
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // One id per occurrence while the sheet is open: a retry after a lost response is then
+  // idempotent on the server instead of recording the payment twice.
+  const paidTxId = useMemo(() => Crypto.randomUUID(), [o?.eventId, o?.originalDate]);
 
   useEffect(() => {
     if (!o) return;
@@ -267,7 +270,7 @@ function OccurrenceSheet({ o, onClose }: { o: OccurrenceDto | null; onClose: () 
               run(() =>
                 api.planner.markPaid(o.eventId, {
                   occurrenceDate: o.originalDate,
-                  transactionId: Crypto.randomUUID(),
+                  transactionId: paidTxId,
                   amount: paidAmount ?? undefined,
                   occurredOn: today(),
                   ...(accountId ? { accountId } : {}),
@@ -292,7 +295,20 @@ function OccurrenceSheet({ o, onClose }: { o: OccurrenceDto | null; onClose: () 
 }
 
 export default function PlanScreen() {
-  const settings = useLocalSettings();
+  return (
+    <FeatureGate
+      feature="calendar"
+      back={false}
+      title="Calendar"
+      featureName="Financial Calendar"
+      description="Enable Financial Calendar in Settings to plan upcoming bills, salaries, and recurring schedules."
+    >
+      <PlanContent />
+    </FeatureGate>
+  );
+}
+
+function PlanContent() {
   const [view, setView] = useState<PlanView>('timeline');
   const t = today();
   const [month, setMonth] = useState(t);
@@ -301,15 +317,6 @@ export default function PlanScreen() {
   const from = view === 'timeline' ? addDays(t, -14) : startOfMonth(month);
   const to = view === 'timeline' ? addDays(t, 90) : endOfMonth(month);
 
-  if (settings.data?.features?.calendar === false) {
-    return (
-      <FeatureDisabledScreen
-        title="Calendar"
-        featureName="Financial Calendar"
-        description="Enable Financial Calendar in Settings to plan upcoming bills, salaries, and recurring schedules."
-      />
-    );
-  }
   const occ = useCachedQuery(['occurrences', from, to], () =>
     getApi().planner.occurrences(from, to),
   );
