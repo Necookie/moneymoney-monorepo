@@ -72,6 +72,25 @@ For `pnpm dev` (plain `next dev`), copy `.env.example` to `.env.local`.
   10 MiB (paid) compressed Worker limits.
 - `compatibility_date` is `2026-11-01`; it must not be newer than the installed `workerd` supports.
 
+### When Windows Application Control blocks native binaries
+
+If Windows (Smart App Control / WDAC) blocks `@next/swc-win32-x64-msvc` and `workerd.exe`
+("An Application Control policy has blocked this file"), `pnpm deploy` fails. Build with webpack
+(Next falls back to WASM SWC) and skip the steps that start workerd locally — this app has no
+incremental cache or skew protection, so nothing is lost:
+
+```sh
+cd apps/web
+export NEXT_PRIVATE_STANDALONE=true NEXT_PRIVATE_OUTPUT_TRACE_ROOT="$(cd ../.. && pwd -W)"
+npx next build --webpack
+npx opennextjs-cloudflare build --skipNextBuild
+OPEN_NEXT_DEPLOY=true npx wrangler deploy     # roll back: npx wrangler rollback <version-id>
+```
+
+The GitHub "Deploy web" workflow avoids this entirely, but needs the repository secrets
+`CLOUDFLARE_API_TOKEN` (Workers Scripts: Edit) and `CLOUDFLARE_ACCOUNT_ID`, plus the variable
+`NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, in the `production` environment.
+
 ## Tests
 
 ```sh

@@ -33,5 +33,7 @@ const nextConfig: NextConfig = {
 
 export default nextConfig;
 
-// Makes Cloudflare bindings available to `next dev` (per the OpenNext Cloudflare docs).
-void initOpenNextCloudflareForDev();
+// Makes Cloudflare bindings available to `next dev` (per the OpenNext Cloudflare docs). Only in
+// dev: `next build` doesn't need the local workerd proxy, and starting it there makes builds
+// fail on machines where workerd can't run.
+if (process.env.NODE_ENV === 'development') void initOpenNextCloudflareForDev();
