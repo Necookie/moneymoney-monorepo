@@ -111,7 +111,9 @@ describe('authentication & authorization', () => {
         'access-control-request-method': 'GET',
       },
     });
-    expect(allowed.headers['access-control-allow-origin']).toBe('https://moneymoney.dheynorlanda.me');
+    expect(allowed.headers['access-control-allow-origin']).toBe(
+      'https://moneymoney.dheynorlanda.me',
+    );
     const denied = await t.app.inject({
       method: 'OPTIONS',
       url: '/api/v1/accounts',
