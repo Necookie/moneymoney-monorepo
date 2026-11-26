@@ -21,7 +21,7 @@ a Clerk session token as a bearer token; the Worker itself stores nothing.
 | Name | Where | Notes |
 |---|---|---|
 | `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | **build** environment | Inlined into the bundle at build time. |
-| `NEXT_PUBLIC_API_URL` | **build** environment | Defaults to `https://api.moneymoney.necookie.dev`. No trailing slash, no `/api/v1`. |
+| `NEXT_PUBLIC_API_URL` | **build** environment | Defaults to `https://api-moneymoney.dheynorlanda.me`. No trailing slash, no `/api/v1`. |
 | `NEXT_PUBLIC_CLERK_SIGN_IN_URL` | build (defaults to `/sign-in` in `next.config.ts`) | Also set as a Worker var in `wrangler.jsonc`. |
 | `CLERK_SECRET_KEY` | **Worker secret** | `npx wrangler secret put CLERK_SECRET_KEY` (from `apps/web`). Never commit it. |
 
@@ -49,7 +49,7 @@ pnpm --filter "@mm/web^..." build
 
 cd apps/web
 export NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_live_xxx
-export NEXT_PUBLIC_API_URL=https://api.moneymoney.necookie.dev
+export NEXT_PUBLIC_API_URL=https://api-moneymoney.dheynorlanda.me
 
 pnpm preview          # opennextjs-cloudflare build + local Workers runtime (needs .dev.vars)
 npx wrangler secret put CLERK_SECRET_KEY   # once per environment

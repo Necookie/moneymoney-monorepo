@@ -1,7 +1,7 @@
 import { fetchAndroidCatalog } from '@/lib/android-releases';
 
 /**
- * Stable install link: https://moneymoney.necookie.dev/download/android always redirects to the
+ * Stable install link: https://moneymoney.dheynorlanda.me/download/android always redirects to the
  * newest APK. Used by the QR code so a phone can install without signing in on the website first.
  */
 export async function GET(request: Request) {

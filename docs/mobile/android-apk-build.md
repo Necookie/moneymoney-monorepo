@@ -22,8 +22,8 @@ public values — never put secrets in `EXPO_PUBLIC_*`):
 ```bash
 npx eas-cli@latest env:create --name EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY --value pk_live_xxx \
   --environment production --environment preview --environment development --visibility plaintext
-# Optional (defaults to https://api.moneymoney.necookie.dev, also set in eas.json):
-npx eas-cli@latest env:create --name EXPO_PUBLIC_API_URL --value https://api.moneymoney.necookie.dev \
+# Optional (defaults to https://api-moneymoney.dheynorlanda.me, also set in eas.json):
+npx eas-cli@latest env:create --name EXPO_PUBLIC_API_URL --value https://api-moneymoney.dheynorlanda.me \
   --environment production --environment preview --environment development --visibility plaintext
 ```
 
@@ -118,7 +118,7 @@ creates the GitHub Release. Requires `eas login` for EAS builds and `gh auth log
 ### Where it shows up
 
 - **Web:** Settings → *Android app* (sidebar: *Install Android app*) shows the latest version,
-  size, notes, checksum, a QR code and previous versions. `https://moneymoney.necookie.dev/download/android`
+  size, notes, checksum, a QR code and previous versions. `https://moneymoney.dheynorlanda.me/download/android`
   always redirects to the newest APK; `/api/android/releases` returns the catalogue as JSON
   (both public, cached 5 min).
 - **App:** Home shows an "update available" banner and Settings → *App version* has

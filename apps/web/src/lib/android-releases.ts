@@ -170,7 +170,7 @@ async function fromAtom(): Promise<AndroidReleaseCatalog> {
  */
 export async function fetchAndroidCatalog(): Promise<AndroidReleaseCatalog> {
   const cache = (globalThis as { caches?: { default?: Cache } }).caches?.default;
-  const cacheKey = new Request('https://moneymoney.necookie.dev/__cache/android-catalog-v2');
+  const cacheKey = new Request('https://moneymoney.dheynorlanda.me/__cache/android-catalog-v2');
   const hit = cache ? await cache.match(cacheKey) : undefined;
   if (hit) return (await hit.json()) as AndroidReleaseCatalog;
 

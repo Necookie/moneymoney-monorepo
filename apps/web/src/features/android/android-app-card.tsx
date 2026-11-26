@@ -11,7 +11,7 @@ import type { AndroidReleaseCatalog } from '@/lib/android-releases';
 import { QrCode } from './qr-code';
 
 /** Stable link to the newest APK — what every QR code encodes. */
-export const INSTALL_LINK = 'https://moneymoney.necookie.dev/download/android';
+export const INSTALL_LINK = 'https://moneymoney.dheynorlanda.me/download/android';
 
 function formatSize(bytes: number): string {
   return bytes >= 1_048_576

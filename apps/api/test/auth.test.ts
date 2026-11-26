@@ -107,11 +107,11 @@ describe('authentication & authorization', () => {
       method: 'OPTIONS',
       url: '/api/v1/accounts',
       headers: {
-        origin: 'https://moneymoney.necookie.dev',
+        origin: 'https://moneymoney.dheynorlanda.me',
         'access-control-request-method': 'GET',
       },
     });
-    expect(allowed.headers['access-control-allow-origin']).toBe('https://moneymoney.necookie.dev');
+    expect(allowed.headers['access-control-allow-origin']).toBe('https://moneymoney.dheynorlanda.me');
     const denied = await t.app.inject({
       method: 'OPTIONS',
       url: '/api/v1/accounts',

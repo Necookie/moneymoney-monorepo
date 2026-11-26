@@ -27,5 +27,5 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ vars.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
-          NEXT_PUBLIC_API_URL: https://api.moneymoney.necookie.dev
+          NEXT_PUBLIC_API_URL: https://api-moneymoney.dheynorlanda.me
         run: pnpm run deploy

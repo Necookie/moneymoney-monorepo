@@ -1,6 +1,6 @@
 /**
  * Cloudflare Workers config for the Money Money web app (Next.js via @opennextjs/cloudflare).
- * See docs/deployment/cloudflare-web.md. Served on the custom domain moneymoney.necookie.dev.
+ * See docs/deployment/cloudflare-web.md. Served on the custom domain moneymoney.dheynorlanda.me.
  *
  * Secrets (never commit): `wrangler secret put CLERK_SECRET_KEY`.
  * NEXT_PUBLIC_* values are inlined at build time — set them in the build environment.
@@ -11,7 +11,7 @@
   "account_id": "668f78c5a9581c5051bd60a4985d6166",
   "workers_dev": false,
   "preview_urls": false,
-  "routes": [{ "pattern": "moneymoney.necookie.dev", "custom_domain": true }],
+  "routes": [{ "pattern": "moneymoney.dheynorlanda.me", "custom_domain": true }],
   "main": ".open-next/worker.js",
   // OpenNext requires >= 2024-09-23; keep within the installed workerd's supported range.
   "compatibility_date": "2026-11-01",

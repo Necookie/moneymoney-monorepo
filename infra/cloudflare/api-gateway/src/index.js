@@ -1,5 +1,5 @@
 /**
- * Money Money API gateway (Cloudflare Worker on api.moneymoney.necookie.dev).
+ * Money Money API gateway (Cloudflare Worker on api-moneymoney.dheynorlanda.me).
  *
  * The API container is never published on the internet: the Money Money stack runs its own
  * cloudflared connector, and this Worker reaches the API privately through a Workers VPC service
