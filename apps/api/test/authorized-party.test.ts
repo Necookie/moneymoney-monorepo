@@ -10,7 +10,9 @@ describe('authorized party (azp) rule', () => {
 
   it('rejects browser tokens minted for other origins', () => {
     expect(isAuthorizedParty('https://evil.example', allowed)).toBe(false);
-    expect(isAuthorizedParty('https://moneymoney.dheynorlanda.me.evil.example', allowed)).toBe(false);
+    expect(isAuthorizedParty('https://moneymoney.dheynorlanda.me.evil.example', allowed)).toBe(
+      false,
+    );
   });
 
   it('accepts native-app tokens, which carry no azp claim', () => {
