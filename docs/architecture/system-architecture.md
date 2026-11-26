@@ -9,8 +9,8 @@ flowchart LR
     A[Android app<br/>Expo / React Native<br/>SQLite offline store]
   end
   subgraph Cloudflare
-    WK[Worker: moneymoney-web<br/>Next.js via OpenNext<br/>moneymoney.necookie.dev]
-    GW[Worker: moneymoney-api-gateway<br/>api.moneymoney.necookie.dev]
+    WK[Worker: moneymoney-web<br/>Next.js via OpenNext<br/>moneymoney.dheynorlanda.me]
+    GW[Worker: moneymoney-api-gateway<br/>api-moneymoney.dheynorlanda.me]
     T[Tunnel: moneymoney-api<br/>Workers VPC service, no public hostname]
   end
   C[(Clerk<br/>app_3LlSjoo…)]

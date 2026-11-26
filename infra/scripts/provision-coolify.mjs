@@ -84,8 +84,8 @@ const env = {
   CLERK_SECRET_KEY: fresh.CLERK_SECRET_KEY,
   OWNER_CLERK_USER_IDS: fresh.OWNER_CLERK_USER_ID,
   CLOUDFLARE_TUNNEL_TOKEN: fresh.CLOUDFLARE_TUNNEL_TOKEN,
-  CLERK_AUTHORIZED_PARTIES: 'https://moneymoney.necookie.dev',
-  CORS_ORIGINS: 'https://moneymoney.necookie.dev',
+  CLERK_AUTHORIZED_PARTIES: 'https://moneymoney.dheynorlanda.me,https://moneymoney.necookie.dev',
+  CORS_ORIGINS: 'https://moneymoney.dheynorlanda.me,https://moneymoney.necookie.dev',
   ...(fresh.RCLONE_CONFIG_B64
     ? { RCLONE_CONFIG_B64: fresh.RCLONE_CONFIG_B64, RCLONE_REMOTE: fresh.RCLONE_REMOTE }
     : {}),

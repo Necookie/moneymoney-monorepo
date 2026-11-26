@@ -1,6 +1,6 @@
 # API reference
 
-- Base URL: `https://api.moneymoney.necookie.dev` — all business routes under **`/api/v1`**.
+- Base URL: `https://api-moneymoney.dheynorlanda.me` — all business routes under **`/api/v1`**.
 - Machine-readable spec: [`openapi.json`](openapi.json) (regenerate: `pnpm --filter @mm/api openapi`).
   The running API also serves `/openapi.json` and Swagger UI at `/docs`.
 - Auth: `Authorization: Bearer <Clerk session token>` on every `/api/v1` route.

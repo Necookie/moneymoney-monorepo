@@ -1,12 +1,12 @@
 /** Public runtime configuration (inlined by Expo from EXPO_PUBLIC_* at build time). */
 export const config = {
   clerkPublishableKey: process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY ?? '',
-  apiUrl: (process.env.EXPO_PUBLIC_API_URL || 'https://api.moneymoney.necookie.dev').replace(
+  apiUrl: (process.env.EXPO_PUBLIC_API_URL || 'https://api-moneymoney.dheynorlanda.me').replace(
     /\/+$/,
     '',
   ),
   /** Web app origin — also serves the Android release catalogue used for update checks. */
-  webUrl: (process.env.EXPO_PUBLIC_WEB_URL || 'https://moneymoney.necookie.dev').replace(
+  webUrl: (process.env.EXPO_PUBLIC_WEB_URL || 'https://moneymoney.dheynorlanda.me').replace(
     /\/+$/,
     '',
   ),

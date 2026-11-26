@@ -65,8 +65,8 @@ function buildLocal() {
     NODE_ENV: 'production',
     EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY:
       s.CLERK_PUBLISHABLE_KEY ?? process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY ?? '',
-    EXPO_PUBLIC_API_URL: 'https://api.moneymoney.necookie.dev',
-    EXPO_PUBLIC_WEB_URL: 'https://moneymoney.necookie.dev',
+    EXPO_PUBLIC_API_URL: 'https://api-moneymoney.dheynorlanda.me',
+    EXPO_PUBLIC_WEB_URL: 'https://moneymoney.dheynorlanda.me',
     ORG_GRADLE_PROJECT_MM_UPLOAD_STORE_FILE: store,
     ORG_GRADLE_PROJECT_MM_UPLOAD_STORE_PASSWORD: s.MM_ANDROID_KEYSTORE_PASSWORD,
     ORG_GRADLE_PROJECT_MM_UPLOAD_KEY_ALIAS: s.MM_ANDROID_KEY_ALIAS || 'moneymoney',
@@ -203,7 +203,7 @@ async function main() {
     '--latest',
   ]);
   log(`published ${tag}`);
-  log('install link: https://moneymoney.necookie.dev/download/android');
+  log('install link: https://moneymoney.dheynorlanda.me/download/android');
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

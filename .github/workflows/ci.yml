@@ -41,7 +41,7 @@ jobs:
         env:
           # Build-time only placeholder: a syntactically valid publishable key with no secrets.
           NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_ZXhhbXBsZS5jbGVyay5hY2NvdW50cy5kZXYk
-          NEXT_PUBLIC_API_URL: https://api.moneymoney.necookie.dev
+          NEXT_PUBLIC_API_URL: https://api-moneymoney.dheynorlanda.me
         run: pnpm turbo run build --filter=@mm/web
 
   api-image:

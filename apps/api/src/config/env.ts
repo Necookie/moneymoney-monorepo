@@ -28,7 +28,7 @@ const envSchema = z.object({
   CLERK_SECRET_KEY: z.string().min(1),
   /** PEM public key for networkless JWT verification (optional; JWKS is fetched otherwise). */
   CLERK_JWT_KEY: z.string().optional(),
-  /** Allowed `azp` origins for session tokens, e.g. https://moneymoney.necookie.dev */
+  /** Allowed `azp` origins for session tokens, e.g. https://moneymoney.dheynorlanda.me */
   CLERK_AUTHORIZED_PARTIES: list,
   /**
    * Clerk user ids allowed to use this private, single-user instance. Requests from any other

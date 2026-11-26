@@ -24,7 +24,7 @@ export async function createTestApp(options: { owners?: string[] } = {}) {
       return { sub };
     },
     ownerClerkUserIds: options.owners ?? ['user_owner', 'user_partner'],
-    corsOrigins: ['https://moneymoney.necookie.dev'],
+    corsOrigins: ['https://moneymoney.dheynorlanda.me'],
     rateLimitPerMinute: 10_000,
     enableDocs: true,
   });

@@ -65,7 +65,7 @@ export class ApiError extends Error {
 }
 
 export interface ApiClientOptions {
-  /** e.g. https://api.moneymoney.necookie.dev */
+  /** e.g. https://api-moneymoney.dheynorlanda.me */
   baseUrl: string;
   /** Returns a fresh Clerk session token (or null when signed out). */
   getToken: () => Promise<string | null>;

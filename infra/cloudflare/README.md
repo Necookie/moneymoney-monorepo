@@ -1,4 +1,4 @@
-# Cloudflare (account `668f78c5…`, zone `necookie.dev`, Free plan)
+# Cloudflare (account `668f78c5…`, zone `dheynorlanda.me`, Free plan)
 
 All resources below are new and Money Money-specific. No existing DNS record, shared tunnel or
 other Worker was modified. Provisioned with Wrangler's OAuth login (`wrangler login`), which has
@@ -7,13 +7,13 @@ Workers, Workers routes and Connectivity (tunnels / Workers VPC) scopes but **no
 
 | Resource | Purpose |
 |---|---|
-| Worker `moneymoney-web` + custom domain `moneymoney.necookie.dev` | Web app (Next.js via OpenNext) — `apps/web/wrangler.jsonc` |
+| Worker `moneymoney-web` + custom domain `moneymoney.dheynorlanda.me` | Web app (Next.js via OpenNext) — `apps/web/wrangler.jsonc` |
 | Tunnel `moneymoney-api` (`79f966a9-59a4-4189-bb80-8aec70e98b71`, remotely managed) | Private connector run by the `moneymoney-tunnel` container inside the Money Money stack. **No public hostname / ingress rules.** |
 | Workers VPC service `moneymoney-api` (`01a1b4ca-fd2a-7bf3-a6cf-2c6192c79874`) | HTTP → hostname `moneymoney-api`, port 3001, via that tunnel. cloudflared resolves the name with Docker's DNS on the stack network. |
-| Worker `moneymoney-api-gateway` + custom domain `api.moneymoney.necookie.dev` | Public API entry point; forwards only `/health`, `/ready`, `/api/v1/*`, `/docs`, `/openapi.json` to the VPC binding; sets `X-Forwarded-For`/`CF-Connecting-IP` from the real client IP; 502 envelope if the stack is down. Source: [`api-gateway/`](api-gateway) |
+| Worker `moneymoney-api-gateway` + custom domain `api-moneymoney.dheynorlanda.me` | Public API entry point; forwards only `/health`, `/ready`, `/api/v1/*`, `/docs`, `/openapi.json` to the VPC binding; sets `X-Forwarded-For`/`CF-Connecting-IP` from the real client IP; 502 envelope if the stack is down. Source: [`api-gateway/`](api-gateway) |
 
 ```text
-client ──HTTPS──▶ Worker moneymoney-api-gateway (api.moneymoney.necookie.dev)
+client ──HTTPS──▶ Worker moneymoney-api-gateway (api-moneymoney.dheynorlanda.me)
                      │  env.API.fetch()  (Workers VPC, open beta)
                      ▼
                Tunnel moneymoney-api ◀── QUIC (outbound UDP 7844) ── cloudflared container
@@ -23,7 +23,7 @@ client ──HTTPS──▶ Worker moneymoney-api-gateway (api.moneymoney.necook
 ```
 
 Workers custom domains get their own edge certificate, so the two-level hostname
-`api.moneymoney.necookie.dev` works on the Free plan (issuance took ~5 minutes the first time).
+`api-moneymoney.dheynorlanda.me` works on the Free plan (issuance took ~5 minutes the first time).
 
 ## Recreate from scratch
 

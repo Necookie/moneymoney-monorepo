@@ -12,7 +12,7 @@ database, credentials, volumes, networks, tunnel, backups and lifecycle.
 | PostgreSQL | `moneymoney-postgres` — dedicated Postgres 17 container, user/db `moneymoney`, unique password |
 | Networks | `moneymoney-db` (internal, no internet) + `moneymoney-network` (egress); Coolify adds a resource-specific network. Not attached to the shared `coolify` network |
 | Volumes | `moneymoney-db-data` (Postgres), `moneymoney-backups` (Coolify may prefix names with the resource UUID) |
-| Public ingress | `api.moneymoney.necookie.dev` → Worker `moneymoney-api-gateway` → Workers VPC → dedicated tunnel `moneymoney-api` ← `moneymoney-tunnel` (cloudflared) → `moneymoney-api:3001` (see [infra/cloudflare](../../infra/cloudflare/README.md)) |
+| Public ingress | `api-moneymoney.dheynorlanda.me` → Worker `moneymoney-api-gateway` → Workers VPC → dedicated tunnel `moneymoney-api` ← `moneymoney-tunnel` (cloudflared) → `moneymoney-api:3001` (see [infra/cloudflare](../../infra/cloudflare/README.md)) |
 | Backups | `moneymoney-backup` sidecar (see [backup-restore.md](backup-restore.md)) |
 
 Compose file: [`infra/coolify/docker-compose.yml`](../../infra/coolify/docker-compose.yml)
@@ -62,7 +62,7 @@ volumes `…_moneymoney-db-data` and `…_moneymoney-backups`.
 ## Verify
 
 ```bash
-curl -s https://api.moneymoney.necookie.dev/health   # {"status":"ok",...}
-curl -s https://api.moneymoney.necookie.dev/ready    # DB reachable
-curl -s https://api.moneymoney.necookie.dev/api/v1/me   # 401 without a token
+curl -s https://api-moneymoney.dheynorlanda.me/health   # {"status":"ok",...}
+curl -s https://api-moneymoney.dheynorlanda.me/ready    # DB reachable
+curl -s https://api-moneymoney.dheynorlanda.me/api/v1/me   # 401 without a token
 ```

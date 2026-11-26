@@ -8,8 +8,8 @@ simulations, budgets and savings goals — on the web and as a native Android ap
 
 | | |
 |---|---|
-| Web | https://moneymoney.necookie.dev (Next.js on Cloudflare Workers) |
-| API | https://api.moneymoney.necookie.dev (Fastify + PostgreSQL on Coolify, via a dedicated Cloudflare Tunnel) |
+| Web | https://moneymoney.dheynorlanda.me (Next.js on Cloudflare Workers) |
+| API | https://api-moneymoney.dheynorlanda.me (Fastify + PostgreSQL on Coolify, via a dedicated Cloudflare Tunnel) |
 | Android | Expo / React Native APK (EAS Build) — iOS-ready codebase |
 | Currency / TZ | PHP (integer centavos) · Asia/Manila |
 
